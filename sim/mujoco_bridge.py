@@ -35,6 +35,7 @@ from std_msgs.msg import Float32MultiArray
 from geometry_msgs.msg import PoseStamped
 
 import mujoco
+import mujoco.viewer
 
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 SCENE_XML = os.path.join(REPO_ROOT, "assets", "mujoco", "scene.xml")
@@ -113,12 +114,14 @@ class MujocoSimNode(Node):
         self.viewer = None
         if use_viewer:
             try:
-                import mujoco_viewer
-                self.viewer = mujoco_viewer.MujocoViewer(self.model, self.data)
+                # Official mujoco.viewer.launch_passive: rendering runs in its
+                # own thread, so it does NOT block rclpy.spin (unlike the
+                # third-party mujoco-python-viewer which froze the window).
+                self.viewer = mujoco.viewer.launch_passive(self.model, self.data)
                 self.viewer.cam.type = mujoco.mjtCamera.mjCAMERA_TRACKING
                 self.viewer.cam.trackbodyid = mujoco.mj_name2id(
                     self.model, mujoco.mjtObj.mjOBJ_BODY, "base_link")
-                self.get_logger().info("mujoco viewer enabled")
+                self.get_logger().info("mujoco viewer (launch_passive) enabled")
             except Exception as e:  # noqa: BLE001
                 self.get_logger().warn(f"viewer unavailable ({e}); headless")
                 self.viewer = None
@@ -183,9 +186,9 @@ class MujocoSimNode(Node):
                     self.get_logger().warn("viewer closed; stopping sim")
                     self.running = False
                     return
-                self.viewer.render()
+                self.viewer.sync()
             except Exception as e:  # noqa: BLE001
-                self.get_logger().warn(f"viewer render failed: {e}")
+                self.get_logger().warn(f"viewer sync failed: {e}")
                 self.viewer = None
 
         # Read post-step state and publish.
@@ -234,11 +237,11 @@ def main():
     finally:
         node.running = False
         node.sim_thread.join(timeout=2.0)
-        if node.viewer is not None:
-            try:
-                node.viewer.close()
-            except Exception:  # noqa: BLE001
-                pass
+        # Do NOT call viewer.close() — launch_passive's viewer thread can
+        # segfault on Jetson during cleanup. Let the process exit naturally;
+        # the OS reaps the viewer thread. Set viewer=None so nothing else
+        # touches it.
+        node.viewer = None
         node.destroy_node()
         rclpy.shutdown()
 
