@@ -1,0 +1,56 @@
+[
+{
+  "directory": "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_motors",
+  "command": "/usr/bin/c++ -DBOOST_SYSTEM_DYN_LINK -DBOOST_SYSTEM_NO_LIB -DFMT_SHARED -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/home/esi/code/roboparty_deploy/src/motors/src -I/home/esi/code/roboparty_deploy/src/motors/include -I/home/esi/code/roboparty_deploy/src/motors/src/drivers/dm -I/home/esi/code/roboparty_deploy/src/motors/src/protocol/can -I/home/esi/code/roboparty_deploy/src/motors/src/protocol/can/.. -I/home/esi/code/roboparty_deploy/src/motors/src/protocol/canfd -I/home/esi/code/roboparty_deploy/src/motors/src/protocol/canfd/.. -I/home/esi/code/roboparty_deploy/src/motors/src/drivers/evo -I/home/esi/code/roboparty_deploy/src/motors/src/drivers/lro -I/home/esi/code/roboparty_deploy/src/motors/src/drivers/robstride -I/home/esi/code/roboparty_deploy/src/motors/src/drivers/xyn -isystem /usr/include/eigen3  -O3 -march=native -O3 -DNDEBUG -std=gnu++17 -fPIC -o CMakeFiles/motors.dir/src/motor_driver.cpp.o -c /home/esi/code/roboparty_deploy/src/motors/src/motor_driver.cpp",
+  "file": "/home/esi/code/roboparty_deploy/src/motors/src/motor_driver.cpp",
+  "output": "CMakeFiles/motors.dir/src/motor_driver.cpp.o"
+},
+{
+  "directory": "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_motors",
+  "command": "/usr/bin/c++ -DBOOST_SYSTEM_DYN_LINK -DBOOST_SYSTEM_NO_LIB -DFMT_SHARED -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -Dmotors_py_EXPORTS -I/home/esi/code/roboparty_deploy/src/motors/include -I/home/esi/code/roboparty_deploy/src/motors/src -I/home/esi/code/roboparty_deploy/src/motors/src/drivers/dm -I/home/esi/code/roboparty_deploy/src/motors/src/protocol/can -I/home/esi/code/roboparty_deploy/src/motors/src/protocol/can/.. -I/home/esi/code/roboparty_deploy/src/motors/src/protocol/canfd -I/home/esi/code/roboparty_deploy/src/motors/src/protocol/canfd/.. -I/home/esi/code/roboparty_deploy/src/motors/src/drivers/evo -I/home/esi/code/roboparty_deploy/src/motors/src/drivers/lro -I/home/esi/code/roboparty_deploy/src/motors/src/drivers/robstride -I/home/esi/code/roboparty_deploy/src/motors/src/drivers/xyn -isystem /usr/include/python3.12 -isystem /usr/include/eigen3  -O3 -march=native -O3 -DNDEBUG -std=gnu++17 -fPIC -fvisibility=hidden -flto -fno-fat-lto-objects -o CMakeFiles/motors_py.dir/src/pybind_module.cpp.o -c /home/esi/code/roboparty_deploy/src/motors/src/pybind_module.cpp",
+  "file": "/home/esi/code/roboparty_deploy/src/motors/src/pybind_module.cpp",
+  "output": "CMakeFiles/motors_py.dir/src/pybind_module.cpp.o"
+},
+{
+  "directory": "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_motors/src/drivers/dm",
+  "command": "/usr/bin/c++ -DBOOST_SYSTEM_DYN_LINK -DBOOST_SYSTEM_NO_LIB -DFMT_SHARED -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/home/esi/code/roboparty_deploy/src/motors/src/drivers/dm -I/home/esi/code/roboparty_deploy/src/motors/include -I/home/esi/code/roboparty_deploy/src/motors/src -I/home/esi/code/roboparty_deploy/src/motors/src/protocol/can -I/home/esi/code/roboparty_deploy/src/motors/src/protocol/can/.. -I/home/esi/code/roboparty_deploy/src/motors/src/protocol/canfd -I/home/esi/code/roboparty_deploy/src/motors/src/protocol/canfd/.. -isystem /usr/include/eigen3  -O3 -march=native -O3 -DNDEBUG -std=gnu++17 -fPIC -o CMakeFiles/dm_motors.dir/dm_motor_driver.cpp.o -c /home/esi/code/roboparty_deploy/src/motors/src/drivers/dm/dm_motor_driver.cpp",
+  "file": "/home/esi/code/roboparty_deploy/src/motors/src/drivers/dm/dm_motor_driver.cpp",
+  "output": "src/drivers/dm/CMakeFiles/dm_motors.dir/dm_motor_driver.cpp.o"
+},
+{
+  "directory": "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_motors/src/drivers/evo",
+  "command": "/usr/bin/c++ -DBOOST_SYSTEM_DYN_LINK -DBOOST_SYSTEM_NO_LIB -DFMT_SHARED -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/home/esi/code/roboparty_deploy/src/motors/src/drivers/evo -I/home/esi/code/roboparty_deploy/src/motors/include -I/home/esi/code/roboparty_deploy/src/motors/src -I/home/esi/code/roboparty_deploy/src/motors/src/protocol/can -I/home/esi/code/roboparty_deploy/src/motors/src/protocol/can/.. -I/home/esi/code/roboparty_deploy/src/motors/src/protocol/canfd -I/home/esi/code/roboparty_deploy/src/motors/src/protocol/canfd/.. -isystem /usr/include/eigen3  -O3 -march=native -O3 -DNDEBUG -std=gnu++17 -fPIC -o CMakeFiles/evo_motors.dir/evo_motor_driver.cpp.o -c /home/esi/code/roboparty_deploy/src/motors/src/drivers/evo/evo_motor_driver.cpp",
+  "file": "/home/esi/code/roboparty_deploy/src/motors/src/drivers/evo/evo_motor_driver.cpp",
+  "output": "src/drivers/evo/CMakeFiles/evo_motors.dir/evo_motor_driver.cpp.o"
+},
+{
+  "directory": "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_motors/src/drivers/lro",
+  "command": "/usr/bin/c++ -DBOOST_SYSTEM_DYN_LINK -DBOOST_SYSTEM_NO_LIB -DFMT_SHARED -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/home/esi/code/roboparty_deploy/src/motors/src/drivers/lro -I/home/esi/code/roboparty_deploy/src/motors/include -I/home/esi/code/roboparty_deploy/src/motors/src -I/home/esi/code/roboparty_deploy/src/motors/src/protocol/canfd -I/home/esi/code/roboparty_deploy/src/motors/src/protocol/canfd/.. -isystem /usr/include/eigen3  -O3 -march=native -O3 -DNDEBUG -std=gnu++17 -fPIC -o CMakeFiles/lro_motors.dir/lro_motor_driver.cpp.o -c /home/esi/code/roboparty_deploy/src/motors/src/drivers/lro/lro_motor_driver.cpp",
+  "file": "/home/esi/code/roboparty_deploy/src/motors/src/drivers/lro/lro_motor_driver.cpp",
+  "output": "src/drivers/lro/CMakeFiles/lro_motors.dir/lro_motor_driver.cpp.o"
+},
+{
+  "directory": "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_motors/src/drivers/robstride",
+  "command": "/usr/bin/c++ -DBOOST_SYSTEM_DYN_LINK -DBOOST_SYSTEM_NO_LIB -DFMT_SHARED -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/home/esi/code/roboparty_deploy/src/motors/src/drivers/robstride -I/home/esi/code/roboparty_deploy/src/motors/include -I/home/esi/code/roboparty_deploy/src/motors/src -I/home/esi/code/roboparty_deploy/src/motors/src/protocol/can -I/home/esi/code/roboparty_deploy/src/motors/src/protocol/can/.. -I/home/esi/code/roboparty_deploy/src/motors/src/protocol/canfd -I/home/esi/code/roboparty_deploy/src/motors/src/protocol/canfd/.. -isystem /usr/include/eigen3  -O3 -march=native -O3 -DNDEBUG -std=gnu++17 -fPIC -o CMakeFiles/robstride_motors.dir/robstride_motor_driver.cpp.o -c /home/esi/code/roboparty_deploy/src/motors/src/drivers/robstride/robstride_motor_driver.cpp",
+  "file": "/home/esi/code/roboparty_deploy/src/motors/src/drivers/robstride/robstride_motor_driver.cpp",
+  "output": "src/drivers/robstride/CMakeFiles/robstride_motors.dir/robstride_motor_driver.cpp.o"
+},
+{
+  "directory": "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_motors/src/drivers/xyn",
+  "command": "/usr/bin/c++ -DBOOST_SYSTEM_DYN_LINK -DBOOST_SYSTEM_NO_LIB -DFMT_SHARED -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/home/esi/code/roboparty_deploy/src/motors/src/drivers/xyn -I/home/esi/code/roboparty_deploy/src/motors/include -I/home/esi/code/roboparty_deploy/src/motors/src -I/home/esi/code/roboparty_deploy/src/motors/src/protocol/canfd -I/home/esi/code/roboparty_deploy/src/motors/src/protocol/canfd/.. -isystem /usr/include/eigen3  -O3 -march=native -O3 -DNDEBUG -std=gnu++17 -fPIC -o CMakeFiles/xyn_motors.dir/xyn_motor_driver.cpp.o -c /home/esi/code/roboparty_deploy/src/motors/src/drivers/xyn/xyn_motor_driver.cpp",
+  "file": "/home/esi/code/roboparty_deploy/src/motors/src/drivers/xyn/xyn_motor_driver.cpp",
+  "output": "src/drivers/xyn/CMakeFiles/xyn_motors.dir/xyn_motor_driver.cpp.o"
+},
+{
+  "directory": "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_motors/src/protocol/can",
+  "command": "/usr/bin/c++ -DBOOST_SYSTEM_DYN_LINK -DBOOST_SYSTEM_NO_LIB -DFMT_SHARED -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/home/esi/code/roboparty_deploy/src/motors/src/protocol/can -I/home/esi/code/roboparty_deploy/src/motors/src/protocol/can/.. -isystem /usr/include/eigen3  -O3 -march=native -O3 -DNDEBUG -std=gnu++17 -fPIC -o CMakeFiles/motors_can.dir/socket_can.cpp.o -c /home/esi/code/roboparty_deploy/src/motors/src/protocol/can/socket_can.cpp",
+  "file": "/home/esi/code/roboparty_deploy/src/motors/src/protocol/can/socket_can.cpp",
+  "output": "src/protocol/can/CMakeFiles/motors_can.dir/socket_can.cpp.o"
+},
+{
+  "directory": "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_motors/src/protocol/canfd",
+  "command": "/usr/bin/c++ -DBOOST_SYSTEM_DYN_LINK -DBOOST_SYSTEM_NO_LIB -DFMT_SHARED -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/home/esi/code/roboparty_deploy/src/motors/src/protocol/canfd -I/home/esi/code/roboparty_deploy/src/motors/src/protocol/canfd/.. -isystem /usr/include/eigen3  -O3 -march=native -O3 -DNDEBUG -std=gnu++17 -fPIC -o CMakeFiles/motors_canfd.dir/socket_canfd.cpp.o -c /home/esi/code/roboparty_deploy/src/motors/src/protocol/canfd/socket_canfd.cpp",
+  "file": "/home/esi/code/roboparty_deploy/src/motors/src/protocol/canfd/socket_canfd.cpp",
+  "output": "src/protocol/canfd/CMakeFiles/motors_canfd.dir/socket_canfd.cpp.o"
+}
+]

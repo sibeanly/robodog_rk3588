@@ -1,0 +1,11 @@
+prefix=/home/esi/code/roboparty_deploy/install_sp_d/roboparty_inference
+exec_prefix=${prefix}
+includedir=/home/esi/code/roboparty_deploy/install_sp_d/roboparty_inference/include
+libdir=/home/esi/code/roboparty_deploy/install_sp_d/roboparty_inference/lib
+
+Name: Yaml-cpp
+Description: A YAML parser and emitter for C++
+Version: 0.9.0
+Requires:
+Libs: -L${libdir} -lyaml-cpp
+Cflags: -I${includedir}

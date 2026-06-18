@@ -1,0 +1,2 @@
+/usr/bin/ar qc libimu_protocol.a CMakeFiles/imu_protocol.dir/can/socket_can.cpp.o CMakeFiles/imu_protocol.dir/serial/serial_port.cpp.o
+/usr/bin/ranlib libimu_protocol.a

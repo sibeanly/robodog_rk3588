@@ -1,0 +1,1 @@
+/home/esi/code/roboparty_deploy/build_sp_d/roboparty_imu/ament_cmake_environment_hooks/local_setup.sh

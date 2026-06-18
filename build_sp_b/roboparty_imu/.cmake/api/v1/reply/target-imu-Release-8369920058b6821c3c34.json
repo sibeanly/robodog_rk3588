@@ -1,0 +1,197 @@
+{
+	"archive" : {},
+	"artifacts" : 
+	[
+		{
+			"path" : "libimu.a"
+		}
+	],
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library",
+			"_install",
+			"ament_cmake_symlink_install_targets",
+			"install",
+			"target_link_libraries",
+			"target_include_directories"
+		],
+		"files" : 
+		[
+			"CMakeLists.txt",
+			"/opt/ros/jazzy/share/ament_cmake_core/cmake/symlink_install/ament_cmake_symlink_install_targets.cmake",
+			"/opt/ros/jazzy/share/ament_cmake_core/cmake/symlink_install/install.cmake"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 32,
+				"parent" : 0
+			},
+			{
+				"command" : 3,
+				"file" : 0,
+				"line" : 47,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 2,
+				"line" : 37,
+				"parent" : 2
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 50,
+				"parent" : 3
+			},
+			{
+				"command" : 4,
+				"file" : 0,
+				"line" : 43,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 36,
+				"parent" : 0
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : " -O3 -march=native -O3 -DNDEBUG -std=gnu++17 -fPIC"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 5,
+					"define" : "FMT_SHARED"
+				},
+				{
+					"backtrace" : 5,
+					"define" : "SPDLOG_COMPILED_LIB"
+				},
+				{
+					"backtrace" : 5,
+					"define" : "SPDLOG_FMT_EXTERNAL"
+				},
+				{
+					"backtrace" : 5,
+					"define" : "SPDLOG_SHARED_LIB"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 6,
+					"path" : "/home/esi/code/roboparty_deploy/src/imu/include"
+				},
+				{
+					"backtrace" : 6,
+					"path" : "/home/esi/code/roboparty_deploy/src/imu/src"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/home/esi/code/roboparty_deploy/src/imu/src/drivers/hipnuc"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/home/esi/code/roboparty_deploy/src/imu/src/protocol/can"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/home/esi/code/roboparty_deploy/src/imu/src/protocol/serial"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/home/esi/code/roboparty_deploy/src/imu/src/drivers/damiao"
+				}
+			],
+			"language" : "CXX",
+			"languageStandard" : 
+			{
+				"backtraces" : 
+				[
+					5
+				],
+				"standard" : "17"
+			},
+			"sourceIndexes" : 
+			[
+				0
+			]
+		}
+	],
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 5,
+			"id" : "hipnuc_imu::@853ff2fc57ceeeb1ae9b"
+		},
+		{
+			"backtrace" : 5,
+			"id" : "damiao_imu::@f5faa987d5d09765164c"
+		},
+		{
+			"backtrace" : 5,
+			"id" : "imu_protocol::@265c2c6246c6aa3fd761"
+		}
+	],
+	"id" : "imu::@6890427a1f51a3e7e1df",
+	"install" : 
+	{
+		"destinations" : 
+		[
+			{
+				"backtrace" : 4,
+				"path" : "lib"
+			}
+		],
+		"prefix" : 
+		{
+			"path" : "/home/esi/code/roboparty_deploy/install_sp_b/roboparty_imu"
+		}
+	},
+	"name" : "imu",
+	"nameOnDisk" : "libimu.a",
+	"paths" : 
+	{
+		"build" : ".",
+		"source" : "."
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/imu_driver.cpp",
+			"sourceGroupIndex" : 0
+		}
+	],
+	"type" : "STATIC_LIBRARY"
+}

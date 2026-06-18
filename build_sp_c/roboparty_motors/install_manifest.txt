@@ -1,0 +1,10 @@
+/home/esi/code/roboparty_deploy/install_sp_c/roboparty_motors/lib/libmotors.a
+/home/esi/code/roboparty_deploy/install_sp_c/roboparty_motors/lib/libdm_motors.a
+/home/esi/code/roboparty_deploy/install_sp_c/roboparty_motors/lib/libevo_motors.a
+/home/esi/code/roboparty_deploy/install_sp_c/roboparty_motors/lib/liblro_motors.a
+/home/esi/code/roboparty_deploy/install_sp_c/roboparty_motors/lib/librobstride_motors.a
+/home/esi/code/roboparty_deploy/install_sp_c/roboparty_motors/lib/libxyn_motors.a
+/home/esi/code/roboparty_deploy/install_sp_c/roboparty_motors/lib/libmotors_can.a
+/home/esi/code/roboparty_deploy/install_sp_c/roboparty_motors/lib/libmotors_canfd.a
+/home/esi/code/roboparty_deploy/install_sp_c/roboparty_motors/lib/cmake/roboparty_motors/roboparty_motorsTargets.cmake
+/home/esi/code/roboparty_deploy/install_sp_c/roboparty_motors/lib/cmake/roboparty_motors/roboparty_motorsTargets-release.cmake

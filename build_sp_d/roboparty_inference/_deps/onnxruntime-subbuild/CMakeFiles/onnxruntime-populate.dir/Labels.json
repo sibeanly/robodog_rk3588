@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_inference/_deps/onnxruntime-subbuild/CMakeFiles/onnxruntime-populate"
+		},
+		{
+			"file" : "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_inference/_deps/onnxruntime-subbuild/CMakeFiles/onnxruntime-populate.rule"
+		},
+		{
+			"file" : "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_inference/_deps/onnxruntime-subbuild/CMakeFiles/onnxruntime-populate-complete.rule"
+		},
+		{
+			"file" : "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_inference/_deps/onnxruntime-subbuild/onnxruntime-populate-prefix/src/onnxruntime-populate-stamp/onnxruntime-populate-build.rule"
+		},
+		{
+			"file" : "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_inference/_deps/onnxruntime-subbuild/onnxruntime-populate-prefix/src/onnxruntime-populate-stamp/onnxruntime-populate-configure.rule"
+		},
+		{
+			"file" : "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_inference/_deps/onnxruntime-subbuild/onnxruntime-populate-prefix/src/onnxruntime-populate-stamp/onnxruntime-populate-download.rule"
+		},
+		{
+			"file" : "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_inference/_deps/onnxruntime-subbuild/onnxruntime-populate-prefix/src/onnxruntime-populate-stamp/onnxruntime-populate-install.rule"
+		},
+		{
+			"file" : "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_inference/_deps/onnxruntime-subbuild/onnxruntime-populate-prefix/src/onnxruntime-populate-stamp/onnxruntime-populate-mkdir.rule"
+		},
+		{
+			"file" : "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_inference/_deps/onnxruntime-subbuild/onnxruntime-populate-prefix/src/onnxruntime-populate-stamp/onnxruntime-populate-patch.rule"
+		},
+		{
+			"file" : "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_inference/_deps/onnxruntime-subbuild/onnxruntime-populate-prefix/src/onnxruntime-populate-stamp/onnxruntime-populate-test.rule"
+		},
+		{
+			"file" : "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_inference/_deps/onnxruntime-subbuild/onnxruntime-populate-prefix/src/onnxruntime-populate-stamp/onnxruntime-populate-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"onnxruntime-populate"
+		],
+		"name" : "onnxruntime-populate"
+	}
+}

@@ -1,0 +1,283 @@
+{
+	"archive" : {},
+	"artifacts" : 
+	[
+		{
+			"path" : "src/drivers/hipnuc/libhipnuc_imu.a"
+		}
+	],
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library",
+			"_install",
+			"ament_cmake_symlink_install_targets",
+			"install",
+			"target_link_libraries",
+			"target_include_directories"
+		],
+		"files" : 
+		[
+			"src/drivers/hipnuc/CMakeLists.txt",
+			"/opt/ros/jazzy/share/ament_cmake_core/cmake/symlink_install/ament_cmake_symlink_install_targets.cmake",
+			"/opt/ros/jazzy/share/ament_cmake_core/cmake/symlink_install/install.cmake",
+			"CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 4,
+				"parent" : 0
+			},
+			{
+				"file" : 3
+			},
+			{
+				"command" : 3,
+				"file" : 3,
+				"line" : 47,
+				"parent" : 2
+			},
+			{
+				"command" : 2,
+				"file" : 2,
+				"line" : 37,
+				"parent" : 3
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 50,
+				"parent" : 4
+			},
+			{
+				"command" : 4,
+				"file" : 0,
+				"line" : 15,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 8,
+				"parent" : 0
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-O3 -DNDEBUG -fPIC"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 6,
+					"define" : "FMT_SHARED"
+				},
+				{
+					"backtrace" : 6,
+					"define" : "SPDLOG_COMPILED_LIB"
+				},
+				{
+					"backtrace" : 6,
+					"define" : "SPDLOG_FMT_EXTERNAL"
+				},
+				{
+					"backtrace" : 6,
+					"define" : "SPDLOG_SHARED_LIB"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 7,
+					"path" : "/home/esi/code/roboparty_deploy/src/imu/src/drivers/hipnuc"
+				},
+				{
+					"backtrace" : 7,
+					"path" : "/home/esi/code/roboparty_deploy/src/imu/include"
+				},
+				{
+					"backtrace" : 7,
+					"path" : "/home/esi/code/roboparty_deploy/src/imu/src"
+				},
+				{
+					"backtrace" : 6,
+					"path" : "/home/esi/code/roboparty_deploy/src/imu/src/protocol/can"
+				},
+				{
+					"backtrace" : 6,
+					"path" : "/home/esi/code/roboparty_deploy/src/imu/src/protocol/serial"
+				}
+			],
+			"language" : "C",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				4,
+				5
+			]
+		},
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : " -O3 -march=native -O3 -DNDEBUG -std=gnu++17 -fPIC"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 6,
+					"define" : "FMT_SHARED"
+				},
+				{
+					"backtrace" : 6,
+					"define" : "SPDLOG_COMPILED_LIB"
+				},
+				{
+					"backtrace" : 6,
+					"define" : "SPDLOG_FMT_EXTERNAL"
+				},
+				{
+					"backtrace" : 6,
+					"define" : "SPDLOG_SHARED_LIB"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 7,
+					"path" : "/home/esi/code/roboparty_deploy/src/imu/src/drivers/hipnuc"
+				},
+				{
+					"backtrace" : 7,
+					"path" : "/home/esi/code/roboparty_deploy/src/imu/include"
+				},
+				{
+					"backtrace" : 7,
+					"path" : "/home/esi/code/roboparty_deploy/src/imu/src"
+				},
+				{
+					"backtrace" : 6,
+					"path" : "/home/esi/code/roboparty_deploy/src/imu/src/protocol/can"
+				},
+				{
+					"backtrace" : 6,
+					"path" : "/home/esi/code/roboparty_deploy/src/imu/src/protocol/serial"
+				}
+			],
+			"language" : "CXX",
+			"languageStandard" : 
+			{
+				"backtraces" : 
+				[
+					6
+				],
+				"standard" : "17"
+			},
+			"sourceIndexes" : 
+			[
+				3
+			]
+		}
+	],
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 6,
+			"id" : "imu_protocol::@265c2c6246c6aa3fd761"
+		}
+	],
+	"id" : "hipnuc_imu::@853ff2fc57ceeeb1ae9b",
+	"install" : 
+	{
+		"destinations" : 
+		[
+			{
+				"backtrace" : 5,
+				"path" : "lib"
+			}
+		],
+		"prefix" : 
+		{
+			"path" : "/home/esi/code/roboparty_deploy/install_sp_b/roboparty_imu"
+		}
+	},
+	"name" : "hipnuc_imu",
+	"nameOnDisk" : "libhipnuc_imu.a",
+	"paths" : 
+	{
+		"build" : "src/drivers/hipnuc",
+		"source" : "src/drivers/hipnuc"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				3,
+				4,
+				5
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/drivers/hipnuc/canopen_parser.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/drivers/hipnuc/hipnuc_can_common.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/drivers/hipnuc/hipnuc_dec.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "src/drivers/hipnuc/hipnuc_imu_driver.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/drivers/hipnuc/hipnuc_j1939_parser.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/drivers/hipnuc/nmea_decode.c",
+			"sourceGroupIndex" : 0
+		}
+	],
+	"type" : "STATIC_LIBRARY"
+}

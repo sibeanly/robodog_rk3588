@@ -1,0 +1,198 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Release-dc823c02841ef63ed67b.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.20"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						2,
+						4,
+						5,
+						6
+					]
+				},
+				{
+					"build" : "src",
+					"childIndexes" : 
+					[
+						2,
+						5
+					],
+					"jsonFile" : "directory-src-Release-b6cf2213fc5053b67c22.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.20"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "src"
+				},
+				{
+					"build" : "src/drivers",
+					"childIndexes" : 
+					[
+						3,
+						4
+					],
+					"jsonFile" : "directory-src.drivers-Release-7a285a5331bf370e54a5.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.20"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "src/drivers"
+				},
+				{
+					"build" : "src/drivers/hipnuc",
+					"jsonFile" : "directory-src.drivers.hipnuc-Release-b30af52384d00bd57ba1.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.20"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 0,
+					"source" : "src/drivers/hipnuc",
+					"targetIndexes" : 
+					[
+						1
+					]
+				},
+				{
+					"build" : "src/drivers/damiao",
+					"jsonFile" : "directory-src.drivers.damiao-Release-bd2a3f5932189a82769c.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.20"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 0,
+					"source" : "src/drivers/damiao",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"build" : "src/protocol",
+					"jsonFile" : "directory-src.protocol-Release-e2dbaf013debbf9929df.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.20"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "src/protocol",
+					"targetIndexes" : 
+					[
+						3
+					]
+				}
+			],
+			"name" : "Release",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5
+					],
+					"name" : "roboparty_imu",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 4,
+					"id" : "damiao_imu::@f5faa987d5d09765164c",
+					"jsonFile" : "target-damiao_imu-Release-999c5c1a9d94bda083b6.json",
+					"name" : "damiao_imu",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "hipnuc_imu::@853ff2fc57ceeeb1ae9b",
+					"jsonFile" : "target-hipnuc_imu-Release-9545c64ce6cfca82c44a.json",
+					"name" : "hipnuc_imu",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "imu::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-imu-Release-8369920058b6821c3c34.json",
+					"name" : "imu",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "imu_protocol::@265c2c6246c6aa3fd761",
+					"jsonFile" : "target-imu_protocol-Release-79182e35159047c2a017.json",
+					"name" : "imu_protocol",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "imu_py::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-imu_py-Release-84948e4cf39f2bcc3a5f.json",
+					"name" : "imu_py",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "roboparty_imu_uninstall::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-roboparty_imu_uninstall-Release-70311206f73e545c566c.json",
+					"name" : "roboparty_imu_uninstall",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "uninstall::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-uninstall-Release-69cc5e413c2e991a8e58.json",
+					"name" : "uninstall",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/esi/code/roboparty_deploy/build_sp_b/roboparty_imu",
+		"source" : "/home/esi/code/roboparty_deploy/src/imu"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 6
+	}
+}

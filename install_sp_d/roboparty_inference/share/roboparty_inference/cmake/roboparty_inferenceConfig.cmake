@@ -1,0 +1,1 @@
+/home/esi/code/roboparty_deploy/build_sp_d/roboparty_inference/ament_cmake_core/roboparty_inferenceConfig.cmake

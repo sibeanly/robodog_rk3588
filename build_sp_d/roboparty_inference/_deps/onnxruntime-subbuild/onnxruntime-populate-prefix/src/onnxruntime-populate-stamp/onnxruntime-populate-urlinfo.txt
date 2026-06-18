@@ -1,0 +1,12 @@
+# This is a generated file and its contents are an internal implementation detail.
+# The download step will be re-executed if anything in this file changes.
+# No other meaning or use of this file is supported.
+
+method=url
+command=/usr/bin/cmake;-P;/home/esi/code/roboparty_deploy/build_sp_d/roboparty_inference/_deps/onnxruntime-subbuild/onnxruntime-populate-prefix/src/onnxruntime-populate-stamp/verify-onnxruntime-populate.cmake;COMMAND;/usr/bin/cmake;-P;/home/esi/code/roboparty_deploy/build_sp_d/roboparty_inference/_deps/onnxruntime-subbuild/onnxruntime-populate-prefix/src/onnxruntime-populate-stamp/extract-onnxruntime-populate.cmake
+source_dir=/home/esi/code/roboparty_deploy/src/inference/thirdparty/onnxruntime
+work_dir=/home/esi/code/roboparty_deploy/src/inference/thirdparty
+url(s)=/home/esi/code/roboparty_deploy/src/inference/thirdparty/onnxruntime-linux-aarch64-1.21.0.tgz
+hash=SHA256=4508084bde1232ee1ab4b6fad2155be0ea2ccab1c1aae9910ddb3fb68a60805e
+no_extract=
+

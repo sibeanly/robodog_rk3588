@@ -1,0 +1,1 @@
+/home/esi/code/roboparty_deploy/src/inference/launch/inference.launch.py

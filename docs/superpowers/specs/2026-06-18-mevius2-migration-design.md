@@ -84,22 +84,36 @@ pybind11 导出 `motors_py.MotorDriver`。
 
 **模型**：`policy.pt`→`policy_mevius2.onnx`（导出脚本，torch.jit.load + torch.onnx.export，验证 (1,34)→(1,12)）。
 
-**obs_manager 改造**（关键）：
-原框架用 `obs_layouts` 字符串 DSL 拼装观测。mevius2 的 34维布局含 is_standing 标志、dof_sym_sign、gravity_b 计算，超出纯字符串表达。**方案**：为 mevius2 策略新增一个 C++ obs 构建路径（`Mevius2ObsBuilder`），硬编码该策略的 obs 逻辑，由 `inference_mevius2.yaml` 的 `obs_layout: "mevius2"` 触发。保留原 DSL 路径不动。
+**obs_manager 改造**（关键，已探查现有代码后优化方案）：
+探查发现 roboparty 现有 obs_manager（`src/inference/src/obs_manager.cpp`）已是 **DSL + 函数指针表**架构，且**已实现 mevius2 所需的大部分 segment**：
+- `get_ang_vel_obs`（×obs_scales_ang_vel，`:146`）
+- `get_gravity_b_obs`（已做 `R(q)ᵀ·[0,0,-1]` + 倾倒保护，`:153`，quat 用 w-first Eigen 构造，与 IMU 基类 (w,x,y,z) 一致）
+- `get_cmd_vel_obs`（按 [lin_vel,lin_vel,ang_vel] 缩放，`:169`）
+- `get_dof_pos_obs`（已减 `joint_default_angle` + 经 `usd2urdf` 重映射 + obs_scales_dof_pos，`:176`）
+- `get_dof_vel_obs`（已缩放，`:186`）
+- `get_last_action_obs`、`get_interrupt_obs`（二值标志参考）
+- action 处理 `act = act*action_scale + joint_default_angle`（`inference_node.cpp:311`）
 
-obs 构建（C++）：
+**优化方案（替代原 Mevius2ObsBuilder 硬编码）**：复用现有 DSL，仅做 3 处小补丁：
+1. **新增 `is_standing` obs source**：仿 `get_interrupt_obs`，`segment[0] = float(norm(cmd[:3]) < 0.03)`。注册进 obs source 表。
+2. **dof_sym_sign 支持**：mevius2 对 dof_pos/dof_vel/action 乘 sym_sign `[1,1,1,-1,1,1,1,1,1,-1,1,1]`（策略层左右对称，区别于电机层 motor_sign）。在 `get_dof_pos_obs`/`get_dof_vel_obs`/action 处理中加入可选 sym_sign 数组（配置项 `dof_sym_sign`，缺省全 1 不影响原策略）。注意 sym_sign 作用于 usd2urdf 重映射**之后**的索引。
+3. **配置驱动**：`inference_mevius2.yaml` 用 `obs_layouts: ["ang_vel:3, gravity_b:3, cmd_vel:3, dof_pos:12, dof_vel:12, is_standing:1"]`，`frame_stacks: [1]`（mevius2 无帧堆叠），`obs_scales_ang_vel:0.25, obs_scales_dof_pos:1.0, obs_scales_dof_vel:0.05`，`clip_observations:100`，`dof_sym_sign:[1,1,1,-1,1,1,1,1,1,-1,1,1]`，`usd2urdf:[0..11]`（恒等），`joint_default_angle`（mevius2 DEFAULT_ANGLE），`action_scale:0.2`。
+
+obs 构建（复用现有 + 补丁）：
 ```
-ang_vel[3]      = imu.gyro(rad/s, body frame) × 0.25
-gravity_b[3]    = R(quat_xyzw)ᵀ · [0,0,-1]
-cmd[3]          = [lx,ly,yaw] × [2.0, 2.0, 0.25]
-dof_pos[12]     = (joint_pos - DEFAULT_ANGLE) × sym_sign
-dof_vel[12]     = joint_vel × 0.05 × sym_sign
-is_standing[1]  = float(norm(cmd) < 0.03)
+ang_vel[3]      = imu.gyro(rad/s) × 0.25            [现有 get_ang_vel_obs]
+gravity_b[3]    = R(quat_wxyz)ᵀ · [0,0,-1]          [现有 get_gravity_b_obs]
+cmd[3]          = [lx,ly,yaw] × [2.0,2.0,0.25]      [现有 get_cmd_vel_obs, 配置 scales]
+dof_pos[12]     = (joint_pos - DEFAULT_ANGLE) × sym  [现有 get_dof_pos_obs + sym_sign 补丁]
+dof_vel[12]     = joint_vel × 0.05 × sym            [现有 get_dof_vel_obs + sym_sign 补丁]
+is_standing[1]  = float(norm(cmd) < 0.03)           [新增 source]
 clip ±100
 ```
-- 四元数顺序 (x,y,z,w)
-- sym_sign = [1,1,1, -1,1,1, 1,1,1, -1,1,1]
-- 关节顺序 [BL,BR,FL,FR]×[collar,hip,knee]，与 CAN/motor 顺序一致，无重映射
+- 四元数顺序：IMU 基类存 (w,x,y,z)，gravity_b 计算用 w-first，正确。mevius2 utils 用 (x,y,z,w) 仅是其内部约定，C++ 这里用 w-first 等价。
+- sym_sign = [1,1,1, -1,1,1, 1,1,1, -1,1,1]（策略层），独立于 motor_sign（电机层）
+- 关节顺序 [BL,BR,FL,FR]×[collar,hip,knee]，usd2urdf 恒等，与 CAN/motor 顺序一致
+
+**倾倒保护行为差异**：现有 `get_gravity_b_obs` 在 `gravity_b.z() > gravity_z_upper_` 时 `rclcpp::shutdown`（硬停机）。mevius2 原行为是 kp=kd=0 降级。SP-D 可配置 `gravity_z_upper` 为宽松值（如 -0.5，机器人正常站立时 gravity_b.z≈-1），避免误触发 shutdown；完整降级行为留后续。
 
 **action 处理**：
 ```
@@ -292,7 +306,7 @@ roboparty_deploy/
 
 1. **CAN 拓扑**：原生 mttcan SocketCAN，can0=BL+BR，can1=FL+FR。can_setup 在 start_robot.sh 内 bring up（bitrate 1M）。无需 USB udev 绑定 CAN；IMU udev 绑定 ttyACM0（可选，按 CDC 序列号）。
 2. **电机层（方案C）**：复用 EDULITE_A3 的 `RobstrideCanDriver`（C++，成熟：硬件过滤/互斥/重试/软启动），外层套 roboparty `motor_driver` 抽象 + `motors_py` pybind，**接口与原框架完全一致**，inference_node/robot_py 依赖链不变。不走 ros2_control 硬件接口插件路线（避免与 roboparty 接口链路冲突）。
-3. **obs_manager**：新增 `Mevius2ObsBuilder` 硬编码路径（`obs_layout: "mevius2"` 触发），不扩展原 DSL。C++ obs 输出与 mevius2_utils Python 参考逐元素对齐验证（adversarial verify）。
+3. **obs_manager**：复用现有 DSL（已实现 ang_vel/gravity_b/cmd_vel/dof_pos/default/usd2urdf/action_scale），仅 3 处小补丁：新增 `is_standing` source、dof_sym_sign 支持（配置项）、mevius2 配置文件。C++ obs 输出与 mevius2_utils Python 参考逐元素对齐验证（adversarial verify）。
 4. **仿真（自写 bridge）**：真机/仿真共用 `MotorDriver`/`RobotInterface` 接口，`sim_mode` 切换 `RobStrideMotorDriver`/`SimMotorBackend` 后端，inference_node 无感。mujoco bridge（Python rclpy+mujoco，系统 py3.12）做策略/步态验证；gz bridge 做 ROS2 集成演示，两者共用 SimBackend。仿真 IMU 来自仿真器，不接真机 IMU。
 5. **RS03 V_MAX**：沿用 mevius2 的 20 rad/s（保证策略一致），driver 内可配。
 6. **policy.pt→ONNX（独立子 agent，SP-D1）**：参考飞书文档 https://my.feishu.cn/wiki/QG58wsEU7irHSYkTWlIcLD3znIh + `/home/esi/code/lerobot/openpi/smolvla_on_thor` 代码，在 pytorch 环境（lerobot 框架已装）导出 `policy.pt`→`policy_mevius2.onnx`，(1,34)→(1,12)，内置数值对齐测试（逐元素误差 < 1e-5）。由独立 Agent 执行，产出 `tools/export_policy_onnx.py` + onnx + 对齐报告。

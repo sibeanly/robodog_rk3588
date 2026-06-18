@@ -1,0 +1,68 @@
+[
+{
+  "directory": "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_imu",
+  "command": "/usr/bin/c++ -DFMT_SHARED -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/home/esi/code/roboparty_deploy/src/imu/include -I/home/esi/code/roboparty_deploy/src/imu/src -I/home/esi/code/roboparty_deploy/src/imu/src/drivers/hipnuc -I/home/esi/code/roboparty_deploy/src/imu/src/protocol/can -I/home/esi/code/roboparty_deploy/src/imu/src/protocol/serial -I/home/esi/code/roboparty_deploy/src/imu/src/drivers/damiao  -O3 -march=native -O3 -DNDEBUG -std=gnu++17 -fPIC -o CMakeFiles/imu.dir/src/imu_driver.cpp.o -c /home/esi/code/roboparty_deploy/src/imu/src/imu_driver.cpp",
+  "file": "/home/esi/code/roboparty_deploy/src/imu/src/imu_driver.cpp",
+  "output": "CMakeFiles/imu.dir/src/imu_driver.cpp.o"
+},
+{
+  "directory": "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_imu",
+  "command": "/usr/bin/c++ -DFMT_SHARED -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -Dimu_py_EXPORTS -I/home/esi/code/roboparty_deploy/src/imu/include -I/home/esi/code/roboparty_deploy/src/imu/src -I/home/esi/code/roboparty_deploy/src/imu/src/drivers/hipnuc -I/home/esi/code/roboparty_deploy/src/imu/src/protocol/can -I/home/esi/code/roboparty_deploy/src/imu/src/protocol/serial -I/home/esi/code/roboparty_deploy/src/imu/src/drivers/damiao -isystem /usr/include/python3.12  -O3 -march=native -O3 -DNDEBUG -std=gnu++17 -fPIC -fvisibility=hidden -flto -fno-fat-lto-objects -o CMakeFiles/imu_py.dir/src/pybind_module.cpp.o -c /home/esi/code/roboparty_deploy/src/imu/src/pybind_module.cpp",
+  "file": "/home/esi/code/roboparty_deploy/src/imu/src/pybind_module.cpp",
+  "output": "CMakeFiles/imu_py.dir/src/pybind_module.cpp.o"
+},
+{
+  "directory": "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_imu/src/drivers/hipnuc",
+  "command": "/usr/bin/cc -DFMT_SHARED -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/home/esi/code/roboparty_deploy/src/imu/src/drivers/hipnuc -I/home/esi/code/roboparty_deploy/src/imu/include -I/home/esi/code/roboparty_deploy/src/imu/src -I/home/esi/code/roboparty_deploy/src/imu/src/protocol/can -I/home/esi/code/roboparty_deploy/src/imu/src/protocol/serial -O3 -DNDEBUG -fPIC -o CMakeFiles/hipnuc_imu.dir/canopen_parser.c.o -c /home/esi/code/roboparty_deploy/src/imu/src/drivers/hipnuc/canopen_parser.c",
+  "file": "/home/esi/code/roboparty_deploy/src/imu/src/drivers/hipnuc/canopen_parser.c",
+  "output": "src/drivers/hipnuc/CMakeFiles/hipnuc_imu.dir/canopen_parser.c.o"
+},
+{
+  "directory": "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_imu/src/drivers/hipnuc",
+  "command": "/usr/bin/cc -DFMT_SHARED -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/home/esi/code/roboparty_deploy/src/imu/src/drivers/hipnuc -I/home/esi/code/roboparty_deploy/src/imu/include -I/home/esi/code/roboparty_deploy/src/imu/src -I/home/esi/code/roboparty_deploy/src/imu/src/protocol/can -I/home/esi/code/roboparty_deploy/src/imu/src/protocol/serial -O3 -DNDEBUG -fPIC -o CMakeFiles/hipnuc_imu.dir/hipnuc_can_common.c.o -c /home/esi/code/roboparty_deploy/src/imu/src/drivers/hipnuc/hipnuc_can_common.c",
+  "file": "/home/esi/code/roboparty_deploy/src/imu/src/drivers/hipnuc/hipnuc_can_common.c",
+  "output": "src/drivers/hipnuc/CMakeFiles/hipnuc_imu.dir/hipnuc_can_common.c.o"
+},
+{
+  "directory": "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_imu/src/drivers/hipnuc",
+  "command": "/usr/bin/cc -DFMT_SHARED -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/home/esi/code/roboparty_deploy/src/imu/src/drivers/hipnuc -I/home/esi/code/roboparty_deploy/src/imu/include -I/home/esi/code/roboparty_deploy/src/imu/src -I/home/esi/code/roboparty_deploy/src/imu/src/protocol/can -I/home/esi/code/roboparty_deploy/src/imu/src/protocol/serial -O3 -DNDEBUG -fPIC -o CMakeFiles/hipnuc_imu.dir/hipnuc_dec.c.o -c /home/esi/code/roboparty_deploy/src/imu/src/drivers/hipnuc/hipnuc_dec.c",
+  "file": "/home/esi/code/roboparty_deploy/src/imu/src/drivers/hipnuc/hipnuc_dec.c",
+  "output": "src/drivers/hipnuc/CMakeFiles/hipnuc_imu.dir/hipnuc_dec.c.o"
+},
+{
+  "directory": "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_imu/src/drivers/hipnuc",
+  "command": "/usr/bin/c++ -DFMT_SHARED -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/home/esi/code/roboparty_deploy/src/imu/src/drivers/hipnuc -I/home/esi/code/roboparty_deploy/src/imu/include -I/home/esi/code/roboparty_deploy/src/imu/src -I/home/esi/code/roboparty_deploy/src/imu/src/protocol/can -I/home/esi/code/roboparty_deploy/src/imu/src/protocol/serial  -O3 -march=native -O3 -DNDEBUG -std=gnu++17 -fPIC -o CMakeFiles/hipnuc_imu.dir/hipnuc_imu_driver.cpp.o -c /home/esi/code/roboparty_deploy/src/imu/src/drivers/hipnuc/hipnuc_imu_driver.cpp",
+  "file": "/home/esi/code/roboparty_deploy/src/imu/src/drivers/hipnuc/hipnuc_imu_driver.cpp",
+  "output": "src/drivers/hipnuc/CMakeFiles/hipnuc_imu.dir/hipnuc_imu_driver.cpp.o"
+},
+{
+  "directory": "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_imu/src/drivers/hipnuc",
+  "command": "/usr/bin/cc -DFMT_SHARED -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/home/esi/code/roboparty_deploy/src/imu/src/drivers/hipnuc -I/home/esi/code/roboparty_deploy/src/imu/include -I/home/esi/code/roboparty_deploy/src/imu/src -I/home/esi/code/roboparty_deploy/src/imu/src/protocol/can -I/home/esi/code/roboparty_deploy/src/imu/src/protocol/serial -O3 -DNDEBUG -fPIC -o CMakeFiles/hipnuc_imu.dir/hipnuc_j1939_parser.c.o -c /home/esi/code/roboparty_deploy/src/imu/src/drivers/hipnuc/hipnuc_j1939_parser.c",
+  "file": "/home/esi/code/roboparty_deploy/src/imu/src/drivers/hipnuc/hipnuc_j1939_parser.c",
+  "output": "src/drivers/hipnuc/CMakeFiles/hipnuc_imu.dir/hipnuc_j1939_parser.c.o"
+},
+{
+  "directory": "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_imu/src/drivers/hipnuc",
+  "command": "/usr/bin/cc -DFMT_SHARED -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/home/esi/code/roboparty_deploy/src/imu/src/drivers/hipnuc -I/home/esi/code/roboparty_deploy/src/imu/include -I/home/esi/code/roboparty_deploy/src/imu/src -I/home/esi/code/roboparty_deploy/src/imu/src/protocol/can -I/home/esi/code/roboparty_deploy/src/imu/src/protocol/serial -O3 -DNDEBUG -fPIC -o CMakeFiles/hipnuc_imu.dir/nmea_decode.c.o -c /home/esi/code/roboparty_deploy/src/imu/src/drivers/hipnuc/nmea_decode.c",
+  "file": "/home/esi/code/roboparty_deploy/src/imu/src/drivers/hipnuc/nmea_decode.c",
+  "output": "src/drivers/hipnuc/CMakeFiles/hipnuc_imu.dir/nmea_decode.c.o"
+},
+{
+  "directory": "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_imu/src/drivers/damiao",
+  "command": "/usr/bin/c++ -DFMT_SHARED -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/home/esi/code/roboparty_deploy/src/imu/src/drivers/damiao -I/home/esi/code/roboparty_deploy/src/imu/include -I/home/esi/code/roboparty_deploy/src/imu/src -I/home/esi/code/roboparty_deploy/src/imu/src/protocol/can -I/home/esi/code/roboparty_deploy/src/imu/src/protocol/serial  -O3 -march=native -O3 -DNDEBUG -std=gnu++17 -fPIC -o CMakeFiles/damiao_imu.dir/damiao_imu_driver.cpp.o -c /home/esi/code/roboparty_deploy/src/imu/src/drivers/damiao/damiao_imu_driver.cpp",
+  "file": "/home/esi/code/roboparty_deploy/src/imu/src/drivers/damiao/damiao_imu_driver.cpp",
+  "output": "src/drivers/damiao/CMakeFiles/damiao_imu.dir/damiao_imu_driver.cpp.o"
+},
+{
+  "directory": "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_imu/src/protocol",
+  "command": "/usr/bin/c++ -DFMT_SHARED -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/home/esi/code/roboparty_deploy/src/imu/src/protocol/can -I/home/esi/code/roboparty_deploy/src/imu/src/protocol/serial  -O3 -march=native -O3 -DNDEBUG -std=gnu++17 -fPIC -o CMakeFiles/imu_protocol.dir/can/socket_can.cpp.o -c /home/esi/code/roboparty_deploy/src/imu/src/protocol/can/socket_can.cpp",
+  "file": "/home/esi/code/roboparty_deploy/src/imu/src/protocol/can/socket_can.cpp",
+  "output": "src/protocol/CMakeFiles/imu_protocol.dir/can/socket_can.cpp.o"
+},
+{
+  "directory": "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_imu/src/protocol",
+  "command": "/usr/bin/c++ -DFMT_SHARED -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/home/esi/code/roboparty_deploy/src/imu/src/protocol/can -I/home/esi/code/roboparty_deploy/src/imu/src/protocol/serial  -O3 -march=native -O3 -DNDEBUG -std=gnu++17 -fPIC -o CMakeFiles/imu_protocol.dir/serial/serial_port.cpp.o -c /home/esi/code/roboparty_deploy/src/imu/src/protocol/serial/serial_port.cpp",
+  "file": "/home/esi/code/roboparty_deploy/src/imu/src/protocol/serial/serial_port.cpp",
+  "output": "src/protocol/CMakeFiles/imu_protocol.dir/serial/serial_port.cpp.o"
+}
+]

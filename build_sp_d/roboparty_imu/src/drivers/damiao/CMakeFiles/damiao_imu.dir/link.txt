@@ -1,0 +1,2 @@
+/usr/bin/ar qc libdamiao_imu.a CMakeFiles/damiao_imu.dir/damiao_imu_driver.cpp.o
+/usr/bin/ranlib libdamiao_imu.a

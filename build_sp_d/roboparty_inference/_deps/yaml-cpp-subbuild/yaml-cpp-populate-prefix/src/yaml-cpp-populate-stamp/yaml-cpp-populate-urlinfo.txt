@@ -1,0 +1,12 @@
+# This is a generated file and its contents are an internal implementation detail.
+# The download step will be re-executed if anything in this file changes.
+# No other meaning or use of this file is supported.
+
+method=url
+command=/usr/bin/cmake;-P;/home/esi/code/roboparty_deploy/build_sp_d/roboparty_inference/_deps/yaml-cpp-subbuild/yaml-cpp-populate-prefix/src/yaml-cpp-populate-stamp/verify-yaml-cpp-populate.cmake;COMMAND;/usr/bin/cmake;-P;/home/esi/code/roboparty_deploy/build_sp_d/roboparty_inference/_deps/yaml-cpp-subbuild/yaml-cpp-populate-prefix/src/yaml-cpp-populate-stamp/extract-yaml-cpp-populate.cmake
+source_dir=/home/esi/code/roboparty_deploy/build_sp_d/roboparty_inference/_deps/yaml-cpp-src
+work_dir=/home/esi/code/roboparty_deploy/build_sp_d/roboparty_inference/_deps
+url(s)=/home/esi/code/roboparty_deploy/src/inference/thirdparty/yaml-cpp-0.9.0.tar.gz
+hash=SHA256=298593d9c440fd9034b8b193d96318b76d49bc97c6ceadb7b0836edf0b6d7539
+no_extract=
+
