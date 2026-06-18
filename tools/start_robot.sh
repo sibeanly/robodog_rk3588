@@ -143,8 +143,8 @@ fi
 # 检查是否已source setup文件
 if [ -z "$AMENT_PREFIX_PATH" ]; then
     print_info "未检测到ROS 2环境，正在执行source..."
-    source /opt/ros/humble/setup.bash || {
-        print_error "无法source /opt/ros/humble/setup.bash，请检查路径是否正确"
+    source /opt/ros/jazzy/setup.bash || {
+        print_error "无法source /opt/ros/jazzy/setup.bash，请检查路径是否正确"
         exit 1
     }
 fi
@@ -164,6 +164,10 @@ if ! command -v screen &> /dev/null; then
     print_error "screen 未安装"
     exit 1
 fi
+
+# Bring up native mttcan SocketCAN interfaces on Jetson Thor (mevius2: can0=BL+BR, can1=FL+FR)
+print_info "启动 CAN 接口..."
+bash "$(dirname "$0")/can_setup.sh" || print_error "CAN 接口启动失败（仿真模式可忽略）"
 
 # 编译推理包
 print_info "编译推理包..."

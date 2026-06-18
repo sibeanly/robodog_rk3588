@@ -1,0 +1,7 @@
+# DM-IMU-L1 (DM-Tech) CDC-ACM IMU — bind by USB serial so insertion order doesn't matter.
+# Identified via: udevadm info -a /dev/ttyACM0
+#   idVendor=6877 idProduct=4d55 manufacturer=DM-Tech product=DM-IMU-L1 serial=DMIMU20250212
+# Creates stable symlink /dev/dm_imu (preferred) and keeps /dev/ttyACM0 convention.
+SUBSYSTEM=="tty", ATTRS{idVendor}=="6877", ATTRS{idProduct}=="4d55", \
+  ATTRS{serial}=="DMIMU20250212", \
+  SYMLINK+="dm_imu", MODE="0666", GROUP="dialout"

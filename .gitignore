@@ -1,5 +1,6 @@
 #environment
 .vscode
+.zread/
 
 # Prerequisites
 *.d
