@@ -1,3 +1,0 @@
-source;share/roboparty_inference/environment/ament_prefix_path.sh
-source;share/roboparty_inference/environment/library_path.sh
-source;share/roboparty_inference/environment/path.sh

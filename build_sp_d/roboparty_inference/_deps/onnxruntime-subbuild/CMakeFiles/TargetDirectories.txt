@@ -1,3 +1,0 @@
-/home/esi/code/roboparty_deploy/build_sp_d/roboparty_inference/_deps/onnxruntime-subbuild/CMakeFiles/onnxruntime-populate.dir
-/home/esi/code/roboparty_deploy/build_sp_d/roboparty_inference/_deps/onnxruntime-subbuild/CMakeFiles/edit_cache.dir
-/home/esi/code/roboparty_deploy/build_sp_d/roboparty_inference/_deps/onnxruntime-subbuild/CMakeFiles/rebuild_cache.dir

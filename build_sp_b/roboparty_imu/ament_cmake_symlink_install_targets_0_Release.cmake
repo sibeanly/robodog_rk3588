@@ -1,1 +1,0 @@
-ament_cmake_symlink_install_targets("TARGET_FILES" "/home/esi/code/roboparty_deploy/build_sp_b/roboparty_imu/imu_py.cpython-312-aarch64-linux-gnu.so" "TARGETS" "imu_py" "LIBRARY_DESTINATION" "lib/python3.12/site-packages" "ARCHIVE_DESTINATION" "lib/python3.12/site-packages" "RUNTIME_DESTINATION" "lib/python3.12/site-packages")

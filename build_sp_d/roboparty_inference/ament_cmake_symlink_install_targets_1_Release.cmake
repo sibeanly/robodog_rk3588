@@ -1,1 +1,0 @@
-ament_cmake_symlink_install_targets("TARGET_FILES" "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_inference/inference_node" "TARGETS" "inference_node" "RUNTIME_DESTINATION" "lib/roboparty_inference")

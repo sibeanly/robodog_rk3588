@@ -55,3 +55,7 @@ temp
 cmake-build-debug
 .idea
 log
+
+# colcon build/install artifacts (Jazzy-era build_sp_*/install_sp_* had been committed by mistake)
+build_*
+install_*

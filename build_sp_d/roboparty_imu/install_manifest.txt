@@ -1,6 +1,0 @@
-/home/esi/code/roboparty_deploy/install_sp_d/roboparty_imu/lib/libimu.a
-/home/esi/code/roboparty_deploy/install_sp_d/roboparty_imu/lib/libhipnuc_imu.a
-/home/esi/code/roboparty_deploy/install_sp_d/roboparty_imu/lib/libdamiao_imu.a
-/home/esi/code/roboparty_deploy/install_sp_d/roboparty_imu/lib/libimu_protocol.a
-/home/esi/code/roboparty_deploy/install_sp_d/roboparty_imu/lib/cmake/roboparty_imu/roboparty_imuTargets.cmake
-/home/esi/code/roboparty_deploy/install_sp_d/roboparty_imu/lib/cmake/roboparty_imu/roboparty_imuTargets-release.cmake

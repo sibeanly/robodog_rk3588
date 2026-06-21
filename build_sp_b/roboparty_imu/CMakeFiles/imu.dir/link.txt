@@ -1,2 +1,0 @@
-/usr/bin/ar qc libimu.a CMakeFiles/imu.dir/src/imu_driver.cpp.o
-/usr/bin/ranlib libimu.a

@@ -1,2 +1,0 @@
-/usr/bin/ar qc libxyn_motors.a CMakeFiles/xyn_motors.dir/xyn_motor_driver.cpp.o
-/usr/bin/ranlib libxyn_motors.a

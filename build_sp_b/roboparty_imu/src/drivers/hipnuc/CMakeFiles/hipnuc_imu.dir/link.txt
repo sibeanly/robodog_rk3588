@@ -1,2 +1,0 @@
-/usr/bin/ar qc libhipnuc_imu.a CMakeFiles/hipnuc_imu.dir/canopen_parser.c.o CMakeFiles/hipnuc_imu.dir/hipnuc_can_common.c.o CMakeFiles/hipnuc_imu.dir/hipnuc_dec.c.o CMakeFiles/hipnuc_imu.dir/hipnuc_imu_driver.cpp.o CMakeFiles/hipnuc_imu.dir/hipnuc_j1939_parser.c.o CMakeFiles/hipnuc_imu.dir/nmea_decode.c.o
-/usr/bin/ranlib libhipnuc_imu.a

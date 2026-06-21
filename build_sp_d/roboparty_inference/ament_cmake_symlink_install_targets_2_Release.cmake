@@ -1,1 +1,0 @@
-ament_cmake_symlink_install_targets("TARGET_FILES" "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_inference/librobot.a" "/home/esi/code/roboparty_deploy/build_sp_d/roboparty_inference/src/utils/libutils.a" "TARGETS" "robot" "utils" "ARCHIVE_DESTINATION" "lib" "LIBRARY_DESTINATION" "lib" "RUNTIME_DESTINATION" "bin")
