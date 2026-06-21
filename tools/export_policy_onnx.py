@@ -32,8 +32,10 @@ import onnx
 import onnxruntime as ort
 
 
-DEFAULT_PT = "/home/esi/code/mevius2-master/models/policy.pt"
-DEFAULT_OUT = "/home/esi/code/roboparty_deploy/src/inference/models/policy_mevius2.onnx"
+DEFAULT_PT = "/home/orange5plus/code/mevius2/models/policy.pt"
+DEFAULT_OUT = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), os.pardir,
+    "src", "inference", "models", "policy_mevius2.onnx")
 DEFAULT_OPSET = 17
 DEFAULT_N_SAMPLES = 10
 

@@ -143,8 +143,8 @@ fi
 # 检查是否已source setup文件
 if [ -z "$AMENT_PREFIX_PATH" ]; then
     print_info "未检测到ROS 2环境，正在执行source..."
-    source /opt/ros/jazzy/setup.bash || {
-        print_error "无法source /opt/ros/jazzy/setup.bash，请检查路径是否正确"
+    source /opt/ros/humble/setup.bash || {
+        print_error "无法source /opt/ros/humble/setup.bash，请检查路径是否正确"
         exit 1
     }
 fi

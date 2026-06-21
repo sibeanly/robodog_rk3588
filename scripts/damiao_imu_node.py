@@ -7,7 +7,7 @@ angular_velocity (rad/s) and linear_acceleration (m/s^2). Spins a background
 thread polling the driver at high rate so /imu reflects the latest frame.
 
 Run:
-  source install_sp_d/setup.bash   # provides imu_py
+  source install/setup.bash   # provides imu_py
   ros2 run ... or: /usr/bin/python3 scripts/damiao_imu_node.py
 
 Verify: ros2 topic hz /imu ; ros2 topic echo /imu --once ; rviz2 -> add Imu

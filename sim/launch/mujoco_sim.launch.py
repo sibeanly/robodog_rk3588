@@ -4,7 +4,7 @@
 # Launch the mevius2 mujoco sim: mujoco_bridge (physics) + sim_inference_node
 # (Python policy). Run from a shell with conda deactivated and ROS sourced:
 #   conda deactivate 2>/dev/null; unset PYTHONPATH PYTHONHOME
-#   export PATH=/usr/bin:$PATH; source /opt/ros/jazzy/setup.bash
+#   export PATH=/usr/bin:$PATH; source /opt/ros/humble/setup.bash
 #   ros2 launch mujoco_sim.launch.py [use_viewer:=true]
 #
 # Drive the robot:

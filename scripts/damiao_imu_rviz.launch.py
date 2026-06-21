@@ -2,8 +2,8 @@
 """Launch Damiao IMU node + static tf (world->imu_link) + rviz2 for IMU visualization.
 
 Run:
-  source /opt/ros/jazzy/setup.bash
-  source install_sp_d/setup.bash   # provides imu_py
+  source /opt/ros/humble/setup.bash
+  source install/setup.bash   # provides imu_py
   ros2 launch scripts/damiao_imu_rviz.launch.py
 """
 import os

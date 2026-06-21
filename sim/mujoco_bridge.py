@@ -4,7 +4,7 @@
 #
 # mujoco_bridge.py - mujoco physics bridge for the mevius2 quadruped.
 #
-# Mirrors /home/esi/code/mevius2-master/scripts/mevius2_main.py
+# Mirrors /home/orange5plus/code/mevius2/scripts/mevius2_main.py
 # (mujoco_thread_func): keyframe reset, per-joint qpos/qvel mapping by name,
 # PD torque into data.ctrl, mj_step, then publish joint_states + imu.
 #
