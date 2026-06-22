@@ -5,7 +5,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(__file__))
 from obs_math import (build_obs, action_to_targets, DEFAULT_ANGLE,
                       PER_JOINT_ACTION_SCALE, JOINT_LIMITS, HEIGHT_SCAN_SIZE,
-                      SCALE_ANG_VEL, SCALE_DOF_VEL, CLIP_ACTION)
+                      SCALE_ANG_VEL, SCALE_DOF_VEL, CLIP_ACTION, CLIP_OBS)
 
 def test_obs_shape_and_segments():
     ang_vel = np.array([0.1, -0.2, 0.3])
@@ -55,7 +55,16 @@ def test_action_to_targets_scale_and_clip():
     tgt2 = action_to_targets(act2)
     assert abs(tgt2[1] - (0.7 + CLIP_ACTION * PER_JOINT_ACTION_SCALE[1])) < 1e-6
 
-def test_action_clamped_to_joint_limits():
+def test_extreme_action_stays_within_limits():
+    """A large action still yields targets within JOINT_LIMITS.
+
+    NOTE: under CLIP_ACTION=1.0 the action clip in action_to_targets already
+    keeps targets inside JOINT_LIMITS, so the downstream
+    ``np.clip(tgt, JOINT_LIMITS[:,0], JOINT_LIMITS[:,1])`` is an UNREACHABLE
+    safety net through the public API. This test documents that safety
+    guarantee, not the clamp's execution -- it would still pass if the
+    JOINT_LIMITS clamp line were deleted (the CLIP_ACTION clamp already binds).
+    """
     # huge negative knee action must not exceed lower limit
     act = np.zeros(12); act[2] = -100.0  # knee idx 2
     tgt = action_to_targets(act)
@@ -65,6 +74,37 @@ def test_per_joint_scale_values():
     # collar=0.125, hip=0.15, knee=0.30 per leg
     expected = np.array([0.125, 0.15, 0.30] * 4)
     np.testing.assert_allclose(PER_JOINT_ACTION_SCALE, expected, atol=1e-6)
+
+def test_projected_gravity_nonidentity_quaternion():
+    """projected_gravity (R.T @ [0,0,-1]) under a non-trivial quaternion.
+
+    Uses a 90 deg rotation about the x-axis: wxyz = [cos(pi/4), sin(pi/4),0,0].
+    For this quaternion, build_obs's gravity_b = R.T @ [0,0,-1] = [0,-1,0]. A
+    transposed rotation matrix (R @ v instead of R.T @ v) would give a
+    different result, so this test catches that classic bug -- the
+    identity-quaternion test cannot (R @ v == R.T @ v at the identity).
+    """
+    q = np.array([np.cos(np.pi / 4), np.sin(np.pi / 4), 0.0, 0.0])
+    obs = build_obs(np.zeros(3), q, np.zeros(3),
+                    DEFAULT_ANGLE.copy(), np.zeros(12), np.zeros(12))
+    np.testing.assert_allclose(obs[3:6], [0.0, -1.0, 0.0], atol=1e-6)
+
+def test_clip_obs_applied():
+    """Large observations are clipped to +/- CLIP_OBS (100.0)."""
+    # ang_vel * SCALE_ANG_VEL = [250, -250, 125] -> clipped to [100,-100,100]
+    ang_vel = np.array([1000.0, -1000.0, 500.0])
+    obs = build_obs(ang_vel, np.array([1.0, 0.0, 0.0, 0.0]), np.zeros(3),
+                    DEFAULT_ANGLE.copy(), np.zeros(12), np.zeros(12))
+    np.testing.assert_allclose(obs[0:3],
+                               [CLIP_OBS, -CLIP_OBS, CLIP_OBS], atol=1e-6)
+
+def test_height_scan_nonzero_passed_through():
+    """An explicit height_scan is placed in obs[45:232] (clipped to +/-100)."""
+    height_scan = np.full(HEIGHT_SCAN_SIZE, 0.5)
+    obs = build_obs(np.zeros(3), np.array([1.0, 0.0, 0.0, 0.0]), np.zeros(3),
+                    DEFAULT_ANGLE.copy(), np.zeros(12), np.zeros(12),
+                    height_scan=height_scan)
+    np.testing.assert_allclose(obs[45:232], 0.5, atol=1e-6)
 
 if __name__ == "__main__":
     import pytest
