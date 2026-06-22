@@ -29,6 +29,7 @@ SCALE_DOF_POS = 1.0
 SCALE_DOF_VEL = 0.05
 SCALE_CMD = 1.0  # cmd [vx, vy, wz] scaled by 1.0 (NOT [2,2,0.25] like old mevius2)
 HEIGHT_SCAN_SIZE = 187
+HEIGHT_SCAN_OFFSET = 0.5  # Isaac mdp.height_scan: base_z - ground_z - 0.5, clip [-1,1]
 CLIP_OBS = 100.0
 CLIP_ACTION = 1.0  # new model: clip raw onnx output to [-1, 1] before scaling
 # [vx_lo, vx_hi, vy_lo, vy_hi, wz_lo, wz_hi]
@@ -48,17 +49,27 @@ def quat_wxyz_to_rotmat(wxyz):
 
 
 def build_obs(ang_vel, quat_wxyz, cmd, dof_pos, dof_vel, last_action,
-              height_scan=None):
+              height_scan=None, base_z=None, ground_z=0.0):
     """Build the 232-dim observation vector (float32), policy joint order.
 
     ang_vel: (3,) body-frame angular velocity.
     quat_wxyz: (4,) base orientation, w-first.
     cmd: (3,) [vx, vy, wz] command (already clipped to CLIP_CMD by caller).
     dof_pos, dof_vel, last_action: (12,) in POLICY_JOINT_NAMES order.
-    height_scan: (187,) terrain scan clipped to [-1,1], or None -> zeros.
+    height_scan: (187,) terrain scan already clipped to [-1,1]. If None,
+        computed from base_z as (base_z - ground_z - HEIGHT_SCAN_OFFSET)
+        clipped to [-1,1] -- matches Isaac mdp.height_scan on flat ground
+        (offset=0.5). Pass base_z for the Isaac-consistent flat-ground value.
+    base_z: base link world z, used only when height_scan is None.
+    ground_z: ground plane z (0 for flat ground).
     """
     if height_scan is None:
-        height_scan = np.zeros(HEIGHT_SCAN_SIZE, dtype=np.float64)
+        if base_z is None:
+            height_scan = np.zeros(HEIGHT_SCAN_SIZE, dtype=np.float64)
+        else:
+            val = float(base_z) - float(ground_z) - HEIGHT_SCAN_OFFSET
+            val = min(1.0, max(-1.0, val))  # clip [-1,1] like Isaac
+            height_scan = np.full(HEIGHT_SCAN_SIZE, val, dtype=np.float64)
     gravity_b = quat_wxyz_to_rotmat(quat_wxyz).T @ GRAVITY_W
     obs = np.concatenate([
         np.asarray(ang_vel, dtype=np.float64) * SCALE_ANG_VEL,        # 3

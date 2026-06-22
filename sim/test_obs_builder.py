@@ -106,6 +106,29 @@ def test_height_scan_nonzero_passed_through():
                     height_scan=height_scan)
     np.testing.assert_allclose(obs[45:232], 0.5, atol=1e-6)
 
+def test_height_scan_from_base_z_isaac_convention():
+    """height_scan defaults to base_z - 0.5 (Isaac mdp.height_scan, offset=0.5),
+    clipped to [-1,1]. At standing base_z=0.482 -> ~-0.018 (matches Isaac truth)."""
+    from obs_math import HEIGHT_SCAN_OFFSET
+    obs = build_obs(np.zeros(3), np.array([1.0, 0.0, 0.0, 0.0]), np.zeros(3),
+                    DEFAULT_ANGLE.copy(), np.zeros(12), np.zeros(12),
+                    base_z=0.482)
+    expected = 0.482 - HEIGHT_SCAN_OFFSET  # -0.018
+    np.testing.assert_allclose(obs[45:232], expected, atol=1e-3)
+
+def test_height_scan_clipped_to_limits():
+    """height_scan from base_z is clipped to [-1,1] like Isaac."""
+    # base_z far above ground -> base_z-0.5 > 1 -> clipped to 1.0
+    obs = build_obs(np.zeros(3), np.array([1.0, 0.0, 0.0, 0.0]), np.zeros(3),
+                    DEFAULT_ANGLE.copy(), np.zeros(12), np.zeros(12),
+                    base_z=5.0)
+    np.testing.assert_allclose(obs[45:232], 1.0, atol=1e-6)
+    # base_z below ground -> clipped to -1.0
+    obs2 = build_obs(np.zeros(3), np.array([1.0, 0.0, 0.0, 0.0]), np.zeros(3),
+                     DEFAULT_ANGLE.copy(), np.zeros(12), np.zeros(12),
+                     base_z=-1.0)
+    np.testing.assert_allclose(obs2[45:232], -1.0, atol=1e-6)
+
 if __name__ == "__main__":
     import pytest
     sys.exit(pytest.main([__file__, "-v"]))

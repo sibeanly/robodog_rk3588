@@ -32,7 +32,7 @@ from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy
 from sensor_msgs.msg import JointState, Imu
 from std_msgs.msg import Float32MultiArray
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Twist, PoseStamped
 
 import onnxruntime as ort
 
@@ -68,6 +68,7 @@ class SimInferenceNode(Node):
         self.quat_wxyz = np.array([1.0, 0.0, 0.0, 0.0], dtype=np.float64)
         self.ang_vel = np.zeros(3, dtype=np.float64)  # body frame
         self.cmd = np.zeros(3, dtype=np.float64)       # [vx, vy, wz]
+        self.base_z = 0.482  # default standing height until /mujoco/base_pose arrives
         self.last_action = np.zeros(12, dtype=np.float64)  # raw onnx output, init 0
         self.name_to_idx = {n: i for i, n in enumerate(POLICY_JOINT_NAMES)}
         self.state_lock = threading.Lock()
@@ -78,6 +79,7 @@ class SimInferenceNode(Node):
                          durability=DurabilityPolicy.VOLATILE)
         self.create_subscription(JointState, "/joint_states", self.on_js, qos)
         self.create_subscription(Imu, "/imu", self.on_imu, qos)
+        self.create_subscription(PoseStamped, "/mujoco/base_pose", self.on_pose, qos)
         self.create_subscription(Twist, "/cmd_vel", self.on_cmd, 10)
         self.target_pub = self.create_publisher(Float32MultiArray,
                                                 "/joint_targets", qos)
@@ -108,6 +110,11 @@ class SimInferenceNode(Node):
                  msg.angular_velocity.z], dtype=np.float64)
             self.has_imu = True
 
+    def on_pose(self, msg: PoseStamped):
+        # base link world z, used for Isaac-consistent height_scan (base_z - 0.5).
+        with self.state_lock:
+            self.base_z = float(msg.pose.position.z)
+
     def on_cmd(self, msg: Twist):
         vx = float(np.clip(msg.linear.x, CLIP_CMD[0], CLIP_CMD[1]))
         vy = float(np.clip(msg.linear.y, CLIP_CMD[2], CLIP_CMD[3]))
@@ -127,8 +134,9 @@ class SimInferenceNode(Node):
                     cmd = self.cmd.copy()
                     dof_pos = self.joint_pos.copy()
                     dof_vel = self.joint_vel.copy()
+                    base_z = self.base_z
                 obs = build_obs(ang_vel, quat, cmd, dof_pos, dof_vel,
-                                self.last_action)
+                                self.last_action, base_z=base_z)
                 action = self.session.run(
                     [self.output_name],
                     {self.input_name: obs.reshape(1, -1)})[0][0]
