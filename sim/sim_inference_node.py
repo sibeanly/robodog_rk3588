@@ -2,25 +2,23 @@
 # SPDX-License-Identifier: GPL-3.0
 # Copyright (C) 2025-2026 Luo1imasi
 #
-# sim_inference_node.py - Python alternative to the C++ inference_node for sim.
+# sim_inference_node.py - Python inference for the basemevius2 rough-terrain
+# policy (policy_21399.onnx, 232->12) in mujoco sim.
 #
-# Preferred path (avoids C++ sim_mode churn): replicates the observation math
-# of src/inference/src/obs_manager.cpp and the action mapping of
-# src/inference/src/inference_node.cpp::inference(), so the sim exercises the
-# same policy_mevius2.onnx the real-hardware chain loads.
+# Obs/action math lives in sim/obs_math.py (single source of truth, unit-tested).
 #
-# Obs layout (34): ang_vel(3)*0.25 | gravity_b(3)=R(q_wxyz)^T*[0,0,-1] |
-#                  cmd(3)*[2,2,0.25] | (dof_pos-default)(12)*sym |
-#                  dof_vel(12)*0.05*sym | is_standing(1)
-# Action: clamp raw to +-100; target = action * sym * 0.2 + default (act_alpha=1).
+# Obs layout (232): ang_vel(3)*0.25 | gravity_b(3) | cmd(3)*1.0 |
+#   (dof_pos-default)(12)*1.0 | dof_vel(12)*0.05 | last_action(12) |
+#   height_scan(187) clip[-1,1]   (zeros on flat ground)
+# Action: target = default + clip(action,-1,1) * per_joint_scale, clamp to limits.
 #
 # Topics:
-#   subscribe /joint_states   sensor_msgs/JointState   (12, [BL,BR,FL,FR])
+#   subscribe /joint_states   sensor_msgs/JointState   (12, policy order [FR,FL,BR,BL])
 #   subscribe /imu            sensor_msgs/Imu          (orientation xyzw, body ang_vel)
 #   subscribe /cmd_vel        geometry_msgs/Twist
-#   publish   /joint_targets  std_msgs/Float32MultiArray (12, [BL,BR,FL,FR])
+#   publish   /joint_targets  std_msgs/Float32MultiArray (12, policy order)
 #
-# Runs the policy at 50Hz (CONTROL_DECIMATION=4 over the 200Hz PD).
+# Runs the policy at 50Hz.
 
 import os
 import sys
@@ -38,48 +36,15 @@ from geometry_msgs.msg import Twist
 
 import onnxruntime as ort
 
+sys.path.insert(0, os.path.dirname(__file__))
+from obs_math import (POLICY_JOINT_NAMES, DEFAULT_ANGLE, CLIP_CMD,
+                      build_obs, action_to_targets)
+
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 ONNX_PATH = os.path.join(REPO_ROOT, "src", "inference", "models",
-                         "policy_mevius2.onnx")
-
-# Policy joint order [BL, BR, FL, FR] x [collar, hip, knee].
-JOINT_NAMES = [
-    "BL_collar_joint", "BL_hip_joint", "BL_knee_joint",
-    "BR_collar_joint", "BR_hip_joint", "BR_knee_joint",
-    "FL_collar_joint", "FL_hip_joint", "FL_knee_joint",
-    "FR_collar_joint", "FR_hip_joint", "FR_knee_joint",
-]
-
-# Constants from src/inference/config/inference_mevius2.yaml
-# (scales) and mevius2-master/scripts/parameters.py (DEFAULT_ANGLE, sym).
-DEFAULT_ANGLE = np.array(
-    [0.0, 0.7, -1.2] * 4, dtype=np.float64)
-DOF_SYM = np.array(
-    [1, 1, 1, -1, 1, 1, 1, 1, 1, -1, 1, 1], dtype=np.float64)
-SCALE_ANG_VEL = 0.25
-SCALE_LIN_VEL = 2.0
-SCALE_DOF_POS = 1.0
-SCALE_DOF_VEL = 0.05
-ACTION_SCALE = 0.2
-CLIP_OBS = 100.0
-CLIP_ACTION = 100.0
-# [vx_lo, vx_hi, vy_lo, vy_hi, wz_lo, wz_hi] from inference_mevius2.yaml clip_cmd.
-CLIP_CMD = np.array([-0.4, 0.6, -0.4, 0.4, -0.8, 0.8], dtype=np.float64)
+                         "policy_21399.onnx")
 
 POLICY_HZ = 50
-CMD_SCALE = np.array([SCALE_LIN_VEL, SCALE_LIN_VEL, SCALE_ANG_VEL],
-                     dtype=np.float64)
-GRAVITY_W = np.array([0.0, 0.0, -1.0], dtype=np.float64)
-
-
-def quat_wxyz_to_rotmat(wxyz):
-    """Rotation matrix R with v_world = R @ v_body for w-first quaternion."""
-    w, x, y, z = wxyz
-    return np.array([
-        [1 - 2 * (y * y + z * z), 2 * (x * y - w * z),     2 * (x * z + w * y)],
-        [2 * (x * y + w * z),     1 - 2 * (x * x + z * z), 2 * (y * z - w * x)],
-        [2 * (x * z - w * y),     2 * (y * z + w * x),     1 - 2 * (x * x + y * y)],
-    ])
 
 
 class SimInferenceNode(Node):
@@ -98,14 +63,13 @@ class SimInferenceNode(Node):
             f"loaded ONNX {ONNX_PATH} in={self.session.get_inputs()[0].shape} "
             f"out={out.shape}")
 
-        # State buffers (defaults keep the robot roughly upright until the first
-        # /joint_states + /imu arrive).
         self.joint_pos = DEFAULT_ANGLE.copy()
         self.joint_vel = np.zeros(12, dtype=np.float64)
         self.quat_wxyz = np.array([1.0, 0.0, 0.0, 0.0], dtype=np.float64)
         self.ang_vel = np.zeros(3, dtype=np.float64)  # body frame
         self.cmd = np.zeros(3, dtype=np.float64)       # [vx, vy, wz]
-        self.name_to_idx = {n: i for i, n in enumerate(JOINT_NAMES)}
+        self.last_action = np.zeros(12, dtype=np.float64)  # raw onnx output, init 0
+        self.name_to_idx = {n: i for i, n in enumerate(POLICY_JOINT_NAMES)}
         self.state_lock = threading.Lock()
         self.has_js = False
         self.has_imu = False
@@ -151,50 +115,34 @@ class SimInferenceNode(Node):
         with self.state_lock:
             self.cmd = np.array([vx, vy, wz], dtype=np.float64)
 
-    def build_obs(self) -> np.ndarray:
-        with self.state_lock:
-            quat = self.quat_wxyz.copy()
-            ang_vel = self.ang_vel.copy()
-            cmd = self.cmd.copy()
-            dof_pos = self.joint_pos.copy()
-            dof_vel = self.joint_vel.copy()
-        # gravity_b = R(q_b2w)^T @ [0,0,-1]  (== q_w2b * gravity_w in the C++ node)
-        gravity_b = quat_wxyz_to_rotmat(quat).T @ GRAVITY_W
-        is_standing = 1.0 if float(np.linalg.norm(cmd[:3])) < 0.03 else 0.0
-        obs = np.concatenate([
-            ang_vel * SCALE_ANG_VEL,                                 # 3
-            gravity_b,                                               # 3
-            cmd * CMD_SCALE,                                         # 3
-            (dof_pos - DEFAULT_ANGLE) * SCALE_DOF_POS * DOF_SYM,     # 12
-            dof_vel * SCALE_DOF_VEL * DOF_SYM,                       # 12
-            np.array([is_standing], dtype=np.float64),              # 1
-        ]).astype(np.float32)
-        return np.clip(obs, -CLIP_OBS, CLIP_OBS)
-
     def policy_loop(self):
         period = 1.0 / POLICY_HZ
         next_t = time.monotonic()
         log_counter = 0
         while self.running and rclpy.ok():
             if self.has_js and self.has_imu:
-                obs = self.build_obs()
+                with self.state_lock:
+                    quat = self.quat_wxyz.copy()
+                    ang_vel = self.ang_vel.copy()
+                    cmd = self.cmd.copy()
+                    dof_pos = self.joint_pos.copy()
+                    dof_vel = self.joint_vel.copy()
+                obs = build_obs(ang_vel, quat, cmd, dof_pos, dof_vel,
+                                self.last_action)
                 action = self.session.run(
                     [self.output_name],
                     {self.input_name: obs.reshape(1, -1)})[0][0]
-                action = np.clip(action, -CLIP_ACTION, CLIP_ACTION)
-                target = action * DOF_SYM * ACTION_SCALE + DEFAULT_ANGLE
+                self.last_action = np.asarray(action, dtype=np.float64).copy()
+                target = action_to_targets(action)
                 msg = Float32MultiArray()
                 msg.data = target.astype(np.float32).tolist()
                 self.target_pub.publish(msg)
 
                 log_counter += 1
                 if log_counter % POLICY_HZ == 0:  # ~1s
-                    # obs: [ang_vel(3) | gravity_b(3) | cmd(3) | dof_pos(12) |
-                    #       dof_vel(12) | is_standing(1)]
                     self.get_logger().info(
                         f"gb=[{obs[3]:+.2f},{obs[4]:+.2f},{obs[5]:+.2f}] "
                         f"cmd=[{obs[6]:+.2f},{obs[7]:+.2f},{obs[8]:+.2f}] "
-                        f"stand={obs[33]:.0f} "
                         f"act[0:3]=[{action[0]:+.2f},{action[1]:+.2f},{action[2]:+.2f}] "
                         f"tgt[0:3]=[{target[0]:+.2f},{target[1]:+.2f},{target[2]:+.2f}]")
             next_t += period
