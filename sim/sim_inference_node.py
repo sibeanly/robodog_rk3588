@@ -147,8 +147,10 @@ class SimInferenceNode(Node):
                 self.target_pub.publish(msg)
 
                 log_counter += 1
-                if log_counter % POLICY_HZ == 0:  # ~1s
+                if log_counter <= 10 or log_counter % POLICY_HZ == 0:  # first 10 frames + 1Hz
                     self.get_logger().info(
+                        f"#{log_counter} quat=[{quat[0]:+.3f},{quat[1]:+.3f},{quat[2]:+.3f},{quat[3]:+.3f}] "
+                        f"bz={base_z:.3f} "
                         f"gb=[{obs[3]:+.2f},{obs[4]:+.2f},{obs[5]:+.2f}] "
                         f"cmd=[{obs[6]:+.2f},{obs[7]:+.2f},{obs[8]:+.2f}] "
                         f"act[0:3]=[{action[0]:+.2f},{action[1]:+.2f},{action[2]:+.2f}] "
