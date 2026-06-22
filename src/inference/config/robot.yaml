@@ -1,0 +1,57 @@
+# mevius2 12-DoF quadruped configuration (4 legs x collar/hip/knee).
+# Joint order: [BL, BR, FL, FR] x [collar, hip, knee].
+# Values sourced from mevius2-master/scripts/parameters.py unless noted.
+imu:
+    imu_id: 8
+    imu_interface_type: "serial"
+    imu_interface: "/dev/dm_imu"
+    imu_type: "DAMIAO"
+    baudrate: 921600
+
+motors:
+    # CAN_ID per parameters.py: can0 = BL+BR, can1 = FL+FR.
+    motor_id:
+        [10, 11, 12,
+          7,  8,  9,
+          4,  5,  6,
+          1,  2,  3]
+    motor_interface_type: ["can", "can"]
+    motor_interface: ["can0", "can1"]
+    motor_num: [6, 6]
+    motor_type: ["RobStride03", "RobStride03"]
+    motor_model: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    master_id_offset: 0
+    # motor_zero_offset = MOTOR_OFFSET_ANGLE * MOTOR_DIR (parameters.py).
+    # The RobStride03 driver (mirroring the DM driver) applies the offset inside
+    # the driver as joint = (raw + offset) and the sign externally in
+    # robot_interface as joint = (raw + offset) * motor_sign. mevius2's original
+    # convention (xiaomimotor_lib) is joint = raw*dir + offset, so for the two to
+    # agree offset_rp must be offset_mevius * MOTOR_DIR. Raw MOTOR_OFFSET_ANGLE is
+    # [-3.238870091482476, 5.026955715607949, -2.6040170751403022, ...]; using it
+    # directly would sign-flip the 6 joints with MOTOR_DIR=-1. Verify on hardware.
+    motor_zero_offset:
+        [-3.238870091482476, -5.026955715607949,  2.6040170751403022,
+         -5.261047152636137, -2.5437384874305633, -4.1886434085051345,
+         -4.011600735863964, -2.6327586683677153,  1.5781517697794798,
+         -2.9220982252290044, -0.8847129506115263, -5.91900014038851]
+
+robot:
+    type: "mevius2"
+    kp:
+        [50.0, 50.0, 50.0, 50.0, 50.0, 50.0,
+         50.0, 50.0, 50.0, 50.0, 50.0, 50.0]
+    kd:
+        [2.0, 2.0, 2.0, 2.0, 2.0, 2.0,
+         2.0, 2.0, 2.0, 2.0, 2.0, 2.0]
+    # MOTOR_DIR from parameters.py (motor winding direction).
+    motor_sign:
+        [ 1, -1, -1,
+          1,  1,  1,
+         -1, -1, -1,
+         -1,  1,  1]
+    close_chain_motor_idx: []
+    urdf2motor: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    extrinsic_R:
+        [1.0, 0.0, 0.0,
+         0.0, 1.0, 0.0,
+         0.0, 0.0, 1.0]
