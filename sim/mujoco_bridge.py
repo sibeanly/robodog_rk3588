@@ -9,11 +9,11 @@
 # PD torque into data.ctrl, mj_step, then publish joint_states + imu.
 #
 # Topics:
-#   publish  /joint_states       sensor_msgs/JointState   (12, [BL,BR,FL,FR])
+#   publish  /joint_states       sensor_msgs/JointState   (12, [FR,FL,BR,BL])
 #   publish  /imu                sensor_msgs/Imu          (frame_id=imu_link,
 #                       orientation wxyz->xyzw, ang_vel body-frame from gyro)
 #   publish  /mujoco/base_pose   geometry_msgs/PoseStamped (base xyz+quat, monitor)
-#   subscribe /joint_targets     std_msgs/Float32MultiArray (12, [BL,BR,FL,FR])
+#   subscribe /joint_targets     std_msgs/Float32MultiArray (12, [FR,FL,BR,BL])
 #
 # PD: tau = kp*(target - qpos) + kd*(0 - qvel),  kp=50, kd=2  (200Hz).
 # Spawn: mj_resetDataKeyframe(model, data, 0) -> STANDBY keyframe.
@@ -40,13 +40,13 @@ import mujoco.viewer
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 SCENE_XML = os.path.join(REPO_ROOT, "assets", "mujoco", "scene.xml")
 
-# Policy joint order: [BL, BR, FL, FR] x [collar, hip, knee].
-# (mujoco defines them in FR,FL,BR,BL body order, so we always map by name.)
+# Policy joint order: [FR, FL, BR, BL] x [collar, hip, knee].
+# (mujoco defines them in FR,FL,BR,BL body order, so we map by name.)
 JOINT_NAMES = [
-    "BL_collar_joint", "BL_hip_joint", "BL_knee_joint",
-    "BR_collar_joint", "BR_hip_joint", "BR_knee_joint",
-    "FL_collar_joint", "FL_hip_joint", "FL_knee_joint",
     "FR_collar_joint", "FR_hip_joint", "FR_knee_joint",
+    "FL_collar_joint", "FL_hip_joint", "FL_knee_joint",
+    "BR_collar_joint", "BR_hip_joint", "BR_knee_joint",
+    "BL_collar_joint", "BL_hip_joint", "BL_knee_joint",
 ]
 
 KP = 50.0
