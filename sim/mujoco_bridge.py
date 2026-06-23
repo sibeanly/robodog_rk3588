@@ -204,9 +204,9 @@ class MujocoSimNode(Node):
         """Isaac-consistent height_scan: 187 yaw-aligned down-rays, clipped [-1,1].
 
         height_scan[i] = base_z - ray_hit_z - 0.5, where ray_hit_z is the world z
-        of the terrain hit point. Rays only hit terrain geoms (group 1 = floor +
-        obstacles); robot geoms are group 0, excluded via geomgroup so legs never
-        pollute the scan. Misses (dist<0) -> very low -> clipped to -1.
+        of the terrain hit point. Rays cast against terrain geoms (group 0 =
+        floor + obstacles); robot geoms (group 1) are ignored via geomgroup so
+        legs never pollute the scan. Misses (dist<0) -> ground z=0.
         """
         base_pos = self.data.qpos[0:3].copy()
         base_quat = self.data.qpos[3:7].copy()  # wxyz
@@ -217,14 +217,14 @@ class MujocoSimNode(Node):
         gy = HS_GRID_LOCAL[:, 1]
         wx = base_pos[0] + cy * gx - sy * gy
         wy = base_pos[1] + sy * gx + cy * gy
-        wz = base_pos[2] + 20.0
+        wz = base_pos[2] + 5.0   # well above obstacles (deploy_mujoco uses +5)
         hit_z = np.empty(187, dtype=np.float64)
         for i in range(187):
-            pnt = np.array([wx[i], wy[i], wz[i]])
+            pnt = np.array([wx[i], wy[i], wz])   # wz is a scalar
             dist = mujoco.mj_ray(self.model, self.data, pnt, HS_RAY_DIR,
                                  self._hs_geomgroup, 1, -1, self._hs_geomid)
             if dist < 0:
-                hit_z[i] = -1e6  # miss -> very low -> clips to -1
+                hit_z[i] = 0.0   # miss -> ground z=0
             else:
                 hit_z[i] = wz - dist
         hs = np.clip(base_pos[2] - hit_z - HEIGHT_SCAN_OFFSET, -1.0, 1.0)
