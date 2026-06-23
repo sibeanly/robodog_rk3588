@@ -17,8 +17,10 @@
   </asset>
   <worldbody>
     <body name="base_link" pos="0.0 -0.0 1.0">
-      <!-- inertial pos="0.016596 0.0 0.0549872" (original) -->
-      <inertial pos="0.056596 0.0 0.0549872" quat="-0.000645814 0.719334 0.000786826 0.694663" mass="9.62592" diaginertia="0.0412828 0.027749 0.0238199"/>
+      <!-- base_link CoM: restored to URDF value 0.0166 (both old mevius2 and
+           basemevius2 URDFs agree). Was hand-edited to 0.0566 in the old MJCF;
+           the 4cm forward shift destabilizes the rough-terrain policy. -->
+      <inertial pos="0.016596 0.0 0.0549872" quat="-0.000645814 0.719334 0.000786826 0.694663" mass="9.62592" diaginertia="0.0412828 0.027749 0.0238199"/>
       <joint name="base_joint" type="free" limited="false" actuatorfrclimited="false"/>
       <geom name= "base_link" type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="base_link"/>
       <site name="base_link"/>
