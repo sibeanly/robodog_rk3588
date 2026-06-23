@@ -1,9 +1,0 @@
-[submodule "motors"]
-	path = src/motors
-	url = https://github.com/Roboparty/roboparty_motors.git
-[submodule "imu"]
-	path = src/imu
-	url = https://github.com/Roboparty/roboparty_imu.git
-[submodule "create_ap"]
-	path = tools/create_ap
-	url = https://github.com/Roboparty/create_ap.git
