@@ -55,14 +55,18 @@ EFFORT_LIMIT = 60.0  # DCMotorCfg effort_limit; clip PD torque to +/-60
 SIM_HZ = 200
 
 # Height-scan ray grid: matches IsaacLab GridPatternCfg(resolution=0.1, size=[1.6,1.0]).
-# 17 x 11 = 187 rays, yaw-aligned, shot straight down from base + (grid_xy, +20).
+# 17 x 11 = 187 rays, yaw-aligned, shot straight down from base + (grid_xy, +5).
 # Isaac mdp.height_scan = base_z - ray_hit_z - 0.5, clipped [-1,1].
+# Point order MUST match deploy_mujoco.py / IsaacLab patterns.grid flatten:
+# meshgrid(Y, X, indexing="ij") then stack([X.ravel(), Y.ravel()]) -> x is the
+# inner (fastest-varying) index. A different order scrambles the terrain map the
+# policy sees -> flat-ground walks fine but obstacle crossing fails.
 HEIGHT_SCAN_OFFSET = 0.5
 _HS_SX, _HS_SY, _HS_RES = 1.6, 1.0, 0.1
-_hs_xs = np.arange(-_HS_SX / 2, _HS_SX / 2 + 1e-9, _HS_RES)
-_hs_ys = np.arange(-_HS_SY / 2, _HS_SY / 2 + 1e-9, _HS_RES)
-_HS_GX, _HS_GY = np.meshgrid(_hs_xs, _hs_ys, indexing="ij")  # 17x11
-HS_GRID_LOCAL = np.stack([_HS_GX.ravel(), _HS_GY.ravel(), np.full(187, 20.0)], axis=1)  # (187,3)
+_hs_xs = np.arange(-_HS_SX / 2, _HS_SX / 2 + 1e-9, _HS_RES)   # 17
+_hs_ys = np.arange(-_HS_SY / 2, _HS_SY / 2 + 1e-9, _HS_RES)   # 11
+_HS_YY, _HS_XX = np.meshgrid(_hs_ys, _hs_xs, indexing="ij")   # (11,17)
+HS_GRID_XY = np.stack([_HS_XX.ravel(), _HS_YY.ravel()], axis=1)  # (187,2), x inner
 HS_RAY_DIR = np.array([0.0, 0.0, -1.0])
 HEIGHT_SCAN_HZ = 50  # scanner ticks at policy rate (Isaac: decimation*dt)
 
@@ -213,8 +217,8 @@ class MujocoSimNode(Node):
         w, x, y, z = base_quat
         yaw = np.arctan2(2 * (w * z + x * y), 1 - 2 * (y * y + z * z))
         cy, sy = np.cos(yaw), np.sin(yaw)
-        gx = HS_GRID_LOCAL[:, 0]
-        gy = HS_GRID_LOCAL[:, 1]
+        gx = HS_GRID_XY[:, 0]
+        gy = HS_GRID_XY[:, 1]
         wx = base_pos[0] + cy * gx - sy * gy
         wy = base_pos[1] + sy * gx + cy * gy
         wz = base_pos[2] + 5.0   # well above obstacles (deploy_mujoco uses +5)
