@@ -1,0 +1,84 @@
+# basemevius2 rough-terrain quadruped policy config (12 DoF, 50Hz policy / 200Hz PD).
+# Obs layout total = 3+3+3+12+12+12+187 = 232, matching policy_21399.onnx input.
+#
+# Convention from basemevius2/source/robot_lab/.../rough_env_cfg.py + assets/mevius2.py
+# + onnx_script/DEPLOY_MUJOCO.md (the known-good sim2sim deploy):
+#   - no obs normalization (actor_obs_normalization=False)
+#   - cmd scaled by 1.0 (NOT [2,2,0.25] like old mevius2)
+#   - dof_sym_sign all +1 (new model has NO L/R symmetry sign)
+#   - per-joint action scale: collar=0.125, hip=0.15, knee=0.30
+#   - action clip [-100,100] (training value; RSL-RL actor has no tanh, raw output
+#     reaches ~+-5; clipping to +-1 truncates the gait -> crouches, do NOT use +-1)
+#   - height_scan = 187 zeros on real hardware (no terrain sensor; flat-ground
+#     approximation, only stair/obstacle ability degrades)
+#   - PD kp=50, kd=2, effort_limit=60, policy 50Hz (decimation 4, dt 0.005)
+#
+# Motor/joint order: robot.yaml motor array is [BL,BR,FL,FR] x [collar,hip,knee];
+# policy order is [FR,FL,BR,BL]. usd2urdf[policy_i] = motor index.
+# joint_default_angle / joint_limits / dof_sym_sign / action_scale are indexed by
+# POLICY order (i) in the action mapping (act_[usd2urdf_[i]] uses joint_default_angle_
+# [usd2urdf_[i]] which is motor order, BUT action_scale_[i] and dof_sym_sign_[i]
+# are policy order). To keep it simple and match the action mapping, all per-joint
+# arrays below are written in POLICY order [FR,FL,BR,BL] EXCEPT joint_default_angle
+# and joint_limits which are indexed by usd2urdf_[i] (motor order) in the code.
+# Since all 4 legs are identical ([0,0.7,-1.2], same limits, same scales), the
+# order does not matter for these uniform values.
+inference_node:
+    ros__parameters:
+        model_names: ["policy_21399.onnx"]
+        obs_layouts:
+          - "ang_vel:3, gravity_b:3, cmd_vel:3, dof_pos:12, dof_vel:12, last_action:12, height_scan:187"
+        frame_stacks: [1]
+        obs_stack_orders: ["frame_major"]
+        act_alpha: 1.0
+        joint_num: 12
+        decimation: 4
+        intra_threads: 1
+        dt: 0.005
+        # cmd scaled by 1.0 (new model; old mevius2 used lin_vel=2.0).
+        obs_scales_lin_vel: 1.0
+        obs_scales_ang_vel: 0.25
+        obs_scales_dof_pos: 1.0
+        obs_scales_dof_vel: 0.05
+        obs_scales_gravity_b: 1.0
+        clip_observations: 100.0
+        # Per-joint action scale (policy order [FR,FL,BR,BL] x [collar,hip,knee]).
+        # collar=0.125, hip=0.15, knee=0.30 per leg.
+        action_scale: [0.125, 0.15, 0.30, 0.125, 0.15, 0.30, 0.125, 0.15, 0.30, 0.125, 0.15, 0.30]
+        # Training action clip = (-100,100). Do NOT use 1.0 (truncates gait).
+        clip_actions: 100.0
+        # New model: NO L/R symmetry sign (all +1).
+        dof_sym_sign: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+        # usd2urdf: policy[i] -> motor index. Motor array order [BL,BR,FL,FR]
+        # (robot.yaml motor_id list), policy order [FR,FL,BR,BL].
+        # FR->9,10,11  FL->6,7,8  BR->3,4,5  BL->0,1,2.
+        usd2urdf: [9, 10, 11, 6, 7, 8, 3, 4, 5, 0, 1, 2]
+        clip_cmd:
+            [-0.8, 0.8,
+             -0.5, 0.5,
+             -0.8, 0.8]
+        # joint_default_angle indexed by usd2urdf_[i] (motor order [BL,BR,FL,FR]).
+        # All legs identical [0,0.7,-1.2].
+        joint_default_angle:
+            [0.0, 0.7, -1.2,
+             0.0, 0.7, -1.2,
+             0.0, 0.7, -1.2,
+             0.0, 0.7, -1.2]
+        # Joint limits from mevius2.urdf (identical across all 4 legs), motor order.
+        joint_limits:
+            [-0.7854, 0.7854,
+             -1.0472, 2.6180,
+             -2.8508, -0.7812,
+             -0.7854, 0.7854,
+             -1.0472, 2.6180,
+             -2.8508, -0.7812,
+             -0.7854, 0.7854,
+             -1.0472, 2.6180,
+             -2.8508, -0.7812,
+             -0.7854, 0.7854,
+             -1.0472, 2.6180,
+             -2.8508, -0.7812]
+        # Safety: keep the old mevius2 fall-shutdown threshold (gravity_b.z > -0.5
+        # => robot nearly horizontal => stop). Rough-terrain postures are still
+        # well above this; tuned for real-hardware safety.
+        gravity_z_upper: -0.5

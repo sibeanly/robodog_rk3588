@@ -12,7 +12,7 @@ def generate_launch_description():
         os.path.join(
             get_package_share_directory("roboparty_inference"),
             "config",
-            "inference_mevius2.yaml",
+            "inference_mevius2_rough.yaml",
         ),
     ]
 

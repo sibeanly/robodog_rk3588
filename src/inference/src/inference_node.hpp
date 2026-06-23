@@ -206,7 +206,8 @@ class InferenceNode : public rclcpp::Node {
     float dt_;
     float obs_scales_lin_vel_, obs_scales_ang_vel_, obs_scales_dof_pos_, obs_scales_dof_vel_,
         obs_scales_gravity_b_, clip_observations_;
-    float action_scale_, clip_actions_;
+    std::vector<float> action_scale_;  // per-joint (scalar config broadcasts)
+    float clip_actions_;
     std::vector<double> clip_cmd_, joint_default_angle_, joint_limits_;
     std::vector<long int> usd2urdf_;
     std::vector<float> dof_sym_sign_;
@@ -265,6 +266,7 @@ class InferenceNode : public rclcpp::Node {
     void get_last_action_obs(std::vector<float>& segment);
     void get_interrupt_obs(std::vector<float>& segment);
     void get_is_standing_obs(std::vector<float>& segment);
+    void get_height_scan_obs(std::vector<float>& segment);
     void get_perception_obs(std::vector<float>& segment);
     void get_motion_pos_obs(std::vector<float>& segment);
     void get_motion_vel_obs(std::vector<float>& segment);

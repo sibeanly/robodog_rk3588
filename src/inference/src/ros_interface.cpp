@@ -22,7 +22,11 @@ void InferenceNode::load_config() {
     this->declare_parameter<float>("obs_scales_dof_vel", 1.0);
     this->declare_parameter<float>("obs_scales_gravity_b", 1.0);
     this->declare_parameter<float>("clip_observations", 100.0);
-    this->declare_parameter<float>("action_scale", 0.3);
+    // action_scale: declared as double_array (per-joint). Old scalar configs
+    // must be converted to a 1-element or full array; the active rough config
+    // uses a 12-element array. Scalar broadcast is handled by repeating the
+    // value if the array has 1 element.
+    this->declare_parameter<std::vector<double>>("action_scale", std::vector<double>{});
     this->declare_parameter<float>("clip_actions", 18.0);
     this->declare_parameter<std::vector<long int>>("usd2urdf", std::vector<long int>{});
     this->declare_parameter<std::vector<double>>("clip_cmd", std::vector<double>{});
@@ -54,7 +58,20 @@ void InferenceNode::load_config() {
     this->get_parameter("obs_scales_dof_vel", obs_scales_dof_vel_);
     this->get_parameter("obs_scales_gravity_b", obs_scales_gravity_b_);
     this->get_parameter("clip_observations", clip_observations_);
-    this->get_parameter("action_scale", action_scale_);
+    // action_scale: double_array from config. 1 element -> broadcast to all
+    // joints; otherwise per-joint (must match joint_num_).
+    {
+        std::vector<double> as_param;
+        this->get_parameter("action_scale", as_param);
+        if (as_param.size() == 1) {
+            action_scale_.assign(static_cast<size_t>(joint_num_),
+                                 static_cast<float>(as_param[0]));
+        } else {
+            action_scale_.resize(as_param.size());
+            for (size_t i = 0; i < as_param.size(); ++i)
+                action_scale_[i] = static_cast<float>(as_param[i]);
+        }
+    }
     this->get_parameter("clip_actions", clip_actions_);
     this->get_parameter("usd2urdf", usd2urdf_);
     this->get_parameter("clip_cmd", clip_cmd_);
@@ -162,7 +179,7 @@ void InferenceNode::load_config() {
     RCLCPP_INFO(this->get_logger(), "obs_scales_dof_pos: %f", obs_scales_dof_pos_);
     RCLCPP_INFO(this->get_logger(), "obs_scales_dof_vel: %f", obs_scales_dof_vel_);
     RCLCPP_INFO(this->get_logger(), "obs_scales_gravity_b: %f", obs_scales_gravity_b_);
-    RCLCPP_INFO(this->get_logger(), "action_scale: %f", action_scale_);
+    print_vector<float>("action_scale", action_scale_);
     RCLCPP_INFO(this->get_logger(), "clip_actions: %f", clip_actions_);
     print_vector<long int>("usd2urdf", usd2urdf_);
     print_vector<double>("clip_cmd", clip_cmd_);

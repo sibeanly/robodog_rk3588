@@ -52,6 +52,7 @@ const std::vector<ObsSourceDefinition>& InferenceNode::obs_source_definitions() 
         {"last_action", &InferenceNode::get_last_action_obs},
         {"interrupt", &InferenceNode::get_interrupt_obs},
         {"is_standing", &InferenceNode::get_is_standing_obs},
+        {"height_scan", &InferenceNode::get_height_scan_obs},
         {"perception", &InferenceNode::get_perception_obs},
     };
     return definitions;
@@ -213,6 +214,16 @@ void InferenceNode::get_is_standing_obs(std::vector<float>& segment) {
                                    + cmd_vel_[1] * cmd_vel_[1]
                                    + cmd_vel_[2] * cmd_vel_[2]);
     segment[0] = (cmd_norm < 0.03f) ? 1.0f : 0.0f;
+}
+
+void InferenceNode::get_height_scan_obs(std::vector<float>& segment) {
+    // Real-hardware deployment has no terrain sensor: fill with zeros.
+    // The segment is pre-sized to the layout count (e.g. height_scan:187 -> 187).
+    // Per DEPLOY_MUJOCO.md, flat-ground height_scan ~= base_z-0.5 (~-0.018 at
+    // standing); zeros are an acceptable flat-ground approximation that only
+    // degrades stair/obstacle ability (the rough policy still walks on flat ground).
+    // A future height sensor can populate this buffer with real ray hits.
+    std::fill(segment.begin(), segment.end(), 0.0f);
 }
 
 void InferenceNode::get_perception_obs(std::vector<float>& segment) {

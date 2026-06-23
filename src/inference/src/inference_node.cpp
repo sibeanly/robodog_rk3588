@@ -313,7 +313,8 @@ void InferenceNode::inference() {
                 std::unique_lock<std::mutex> lock(act_mutex_);
                 for (int i = 0; i < policy.ctx->output_buffer.size(); i++) {
                     policy.ctx->output_buffer[i] = std::clamp(policy.ctx->output_buffer[i], -clip_actions_, clip_actions_);
-                    act_[usd2urdf_[i]] = policy.ctx->output_buffer[i] * dof_sym_sign_[i] * action_scale_ + joint_default_angle_[usd2urdf_[i]];
+                    const float sc = (i < static_cast<int>(action_scale_.size())) ? action_scale_[i] : action_scale_.back();
+                    act_[usd2urdf_[i]] = policy.ctx->output_buffer[i] * dof_sym_sign_[i] * sc + joint_default_angle_[usd2urdf_[i]];
                 }
                 if(supports_interrupt() && is_interrupt_.load()){
                     std::unique_lock<std::mutex> lock(interrupt_mutex_);
