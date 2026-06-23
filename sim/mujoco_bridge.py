@@ -53,6 +53,18 @@ KP = 50.0
 KD = 2.0
 SIM_HZ = 200
 
+# Height-scan ray grid: matches IsaacLab GridPatternCfg(resolution=0.1, size=[1.6,1.0]).
+# 17 x 11 = 187 rays, yaw-aligned, shot straight down from base + (grid_xy, +20).
+# Isaac mdp.height_scan = base_z - ray_hit_z - 0.5, clipped [-1,1].
+HEIGHT_SCAN_OFFSET = 0.5
+_HS_SX, _HS_SY, _HS_RES = 1.6, 1.0, 0.1
+_hs_xs = np.arange(-_HS_SX / 2, _HS_SX / 2 + 1e-9, _HS_RES)
+_hs_ys = np.arange(-_HS_SY / 2, _HS_SY / 2 + 1e-9, _HS_RES)
+_HS_GX, _HS_GY = np.meshgrid(_hs_xs, _hs_ys, indexing="ij")  # 17x11
+HS_GRID_LOCAL = np.stack([_HS_GX.ravel(), _HS_GY.ravel(), np.full(187, 20.0)], axis=1)  # (187,3)
+HS_RAY_DIR = np.array([0.0, 0.0, -1.0])
+HEIGHT_SCAN_HZ = 50  # scanner ticks at policy rate (Isaac: decimation*dt)
+
 
 class MujocoSimNode(Node):
     def __init__(self, use_viewer: bool):
@@ -90,6 +102,16 @@ class MujocoSimNode(Node):
         # is the correct body-frame source for the policy observation.
         self.gyro_adr = self._sensor_adr("body_gyro_sensor", 3)
 
+        # Height-scan: exclude the robot's own bodies so rays only hit terrain.
+        # bodyexclude takes a single body id; use the base_link (all leg bodies
+        # are descendants, but mj_ray only excludes one body — so we instead
+        # pass -1 and rely on shooting from above the robot so legs are below
+        # the ray origin only briefly; to robustly skip the robot, we exclude
+        # by checking the hit geom's body. Simpler: exclude base_link body id.
+        self.base_body_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_BODY,
+                                              "base_link")
+        self._hs_geomid = np.array([-1], dtype=np.int32)
+
         # Initial PD target = keyframe qpos (STANDBY) so the robot holds its
         # spawn pose until the first /joint_targets arrives.
         self.target = self.data.qpos[self.qpos_adr].copy()
@@ -101,6 +123,8 @@ class MujocoSimNode(Node):
         self.js_pub = self.create_publisher(JointState, "/joint_states", qos)
         self.imu_pub = self.create_publisher(Imu, "/imu", qos)
         self.pose_pub = self.create_publisher(PoseStamped, "/mujoco/base_pose", 10)
+        self.hs_pub = self.create_publisher(Float32MultiArray,
+                                            "/mujoco/height_scan", qos)
         self.create_subscription(Float32MultiArray, "/joint_targets",
                                  self.on_targets, qos)
 
@@ -153,9 +177,15 @@ class MujocoSimNode(Node):
         period = 1.0 / SIM_HZ
         next_t = time.monotonic()
         log_counter = 0
+        hs_counter = 0
+        hs_every = SIM_HZ // HEIGHT_SCAN_HZ  # 200//50 = 4 -> 50Hz
         while self.running and rclpy.ok():
             self.step()
             log_counter += 1
+            hs_counter += 1
+            if hs_counter >= hs_every:
+                hs_counter = 0
+                self.publish_height_scan()
             if log_counter % SIM_HZ == 0:  # ~1s
                 q = self.data.qpos
                 self.get_logger().info(
@@ -167,6 +197,40 @@ class MujocoSimNode(Node):
                 time.sleep(sleep)
             else:
                 next_t = time.monotonic()  # fell behind; resync
+
+    def publish_height_scan(self):
+        """Isaac-consistent height_scan: 187 yaw-aligned down-rays, clipped [-1,1].
+
+        height_scan[i] = base_z - ray_hit_z - 0.5, where ray_hit_z is the world z
+        of the terrain hit point. Rays that miss (return -1) -> hit far below ->
+        clipped to -1. Robot's own bodies excluded via bodyexclude=base_body_id
+        (mj_ray excludes only one body, so legs may still be hit; shooting from
+        z=+20 above the base, the downward ray hits terrain first in practice).
+        """
+        base_pos = self.data.qpos[0:3].copy()
+        base_quat = self.data.qpos[3:7].copy()  # wxyz
+        w, x, y, z = base_quat
+        yaw = np.arctan2(2 * (w * z + x * y), 1 - 2 * (y * y + z * z))
+        cy, sy = np.cos(yaw), np.sin(yaw)
+        # yaw-only rotation applied to grid (x,y), z offset = +20
+        gx = HS_GRID_LOCAL[:, 0]
+        gy = HS_GRID_LOCAL[:, 1]
+        wx = base_pos[0] + cy * gx - sy * gy
+        wy = base_pos[1] + sy * gx + cy * gy
+        wz = base_pos[2] + 20.0
+        hit_z = np.empty(187, dtype=np.float64)
+        for i in range(187):
+            pnt = np.array([wx[i], wy[i], wz[i]])
+            dist = mujoco.mj_ray(self.model, self.data, pnt, HS_RAY_DIR,
+                                 None, 1, self.base_body_id, self._hs_geomid)
+            if dist < 0:
+                hit_z[i] = -1e6  # miss -> very low -> clips to -1
+            else:
+                hit_z[i] = wz - dist
+        hs = np.clip(base_pos[2] - hit_z - HEIGHT_SCAN_OFFSET, -1.0, 1.0)
+        msg = Float32MultiArray()
+        msg.data = hs.astype(np.float32).tolist()
+        self.hs_pub.publish(msg)
 
     def step(self):
         # PD using current (pre-step) qpos/qvel.

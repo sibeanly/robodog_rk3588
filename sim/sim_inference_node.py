@@ -69,6 +69,7 @@ class SimInferenceNode(Node):
         self.ang_vel = np.zeros(3, dtype=np.float64)  # body frame
         self.cmd = np.zeros(3, dtype=np.float64)       # [vx, vy, wz]
         self.base_z = 0.482  # default standing height until /mujoco/base_pose arrives
+        self.height_scan = None  # filled by /mujoco/height_scan (187 floats)
         self.last_action = np.zeros(12, dtype=np.float64)  # raw onnx output, init 0
         self.name_to_idx = {n: i for i, n in enumerate(POLICY_JOINT_NAMES)}
         self.state_lock = threading.Lock()
@@ -80,6 +81,8 @@ class SimInferenceNode(Node):
         self.create_subscription(JointState, "/joint_states", self.on_js, qos)
         self.create_subscription(Imu, "/imu", self.on_imu, qos)
         self.create_subscription(PoseStamped, "/mujoco/base_pose", self.on_pose, qos)
+        self.create_subscription(Float32MultiArray, "/mujoco/height_scan",
+                                 self.on_height_scan, qos)
         self.create_subscription(Twist, "/cmd_vel", self.on_cmd, 10)
         self.target_pub = self.create_publisher(Float32MultiArray,
                                                 "/joint_targets", qos)
@@ -115,6 +118,11 @@ class SimInferenceNode(Node):
         with self.state_lock:
             self.base_z = float(msg.pose.position.z)
 
+    def on_height_scan(self, msg: Float32MultiArray):
+        # 187 terrain heights from mujoco ray cast (already clipped [-1,1] by bridge).
+        with self.state_lock:
+            self.height_scan = np.asarray(msg.data, dtype=np.float64)
+
     def on_cmd(self, msg: Twist):
         vx = float(np.clip(msg.linear.x, CLIP_CMD[0], CLIP_CMD[1]))
         vy = float(np.clip(msg.linear.y, CLIP_CMD[2], CLIP_CMD[3]))
@@ -135,8 +143,10 @@ class SimInferenceNode(Node):
                     dof_pos = self.joint_pos.copy()
                     dof_vel = self.joint_vel.copy()
                     base_z = self.base_z
+                    height_scan = None if self.height_scan is None else self.height_scan.copy()
                 obs = build_obs(ang_vel, quat, cmd, dof_pos, dof_vel,
-                                self.last_action, base_z=base_z)
+                                self.last_action, height_scan=height_scan,
+                                base_z=base_z)
                 action = self.session.run(
                     [self.output_name],
                     {self.input_name: obs.reshape(1, -1)})[0][0]

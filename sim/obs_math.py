@@ -56,10 +56,9 @@ def build_obs(ang_vel, quat_wxyz, cmd, dof_pos, dof_vel, last_action,
     quat_wxyz: (4,) base orientation, w-first.
     cmd: (3,) [vx, vy, wz] command (already clipped to CLIP_CMD by caller).
     dof_pos, dof_vel, last_action: (12,) in POLICY_JOINT_NAMES order.
-    height_scan: (187,) terrain scan already clipped to [-1,1]. If None,
-        computed from base_z as (base_z - ground_z - HEIGHT_SCAN_OFFSET)
-        clipped to [-1,1] -- matches Isaac mdp.height_scan on flat ground
-        (offset=0.5). Pass base_z for the Isaac-consistent flat-ground value.
+    height_scan: (187,) terrain scan, ideally the real ray-cast values from
+        mujoco (already clipped to [-1,1] by the bridge). If None, fall back
+        to a flat-ground estimate from base_z (base_z - ground_z - 0.5).
     base_z: base link world z, used only when height_scan is None.
     ground_z: ground plane z (0 for flat ground).
     """
@@ -70,6 +69,11 @@ def build_obs(ang_vel, quat_wxyz, cmd, dof_pos, dof_vel, last_action,
             val = float(base_z) - float(ground_z) - HEIGHT_SCAN_OFFSET
             val = min(1.0, max(-1.0, val))  # clip [-1,1] like Isaac
             height_scan = np.full(HEIGHT_SCAN_SIZE, val, dtype=np.float64)
+    else:
+        height_scan = np.asarray(height_scan, dtype=np.float64)
+        if height_scan.shape[0] != HEIGHT_SCAN_SIZE:
+            raise ValueError(f"height_scan len {height_scan.shape[0]} != {HEIGHT_SCAN_SIZE}")
+        height_scan = np.clip(height_scan, -1.0, 1.0)
     gravity_b = quat_wxyz_to_rotmat(quat_wxyz).T @ GRAVITY_W
     obs = np.concatenate([
         np.asarray(ang_vel, dtype=np.float64) * SCALE_ANG_VEL,        # 3
@@ -78,7 +82,7 @@ def build_obs(ang_vel, quat_wxyz, cmd, dof_pos, dof_vel, last_action,
         (np.asarray(dof_pos, dtype=np.float64) - DEFAULT_ANGLE) * SCALE_DOF_POS,  # 12
         np.asarray(dof_vel, dtype=np.float64) * SCALE_DOF_VEL,        # 12
         np.asarray(last_action, dtype=np.float64),                    # 12
-        np.asarray(height_scan, dtype=np.float64),                    # 187
+        height_scan,                                                  # 187
     ])
     return np.clip(obs.astype(np.float32), -CLIP_OBS, CLIP_OBS)
 
