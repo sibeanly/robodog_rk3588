@@ -26,11 +26,11 @@
 
   <worldbody>
     <light pos="0 0 1.5" dir="0 0 -1" directional="true"/>
-    <geom name="floor" pos="0 0 0.0" size="0 0 0.05" type="plane" material="groundplane"/>
+    <geom name="floor" pos="0 0 0.0" size="0 0 0.05" type="plane" material="groundplane" group="1"/>
 
-    <!-- box object -->
+    <!-- box object (group 1 so height-scan rays can isolate terrain) -->
     <body name="box" pos="0.8 0.25 0.05">
-      <geom size="0.2 0.25 0.05" type="box" rgba="0.8 0.6 0.4 1"/>
+      <geom size="0.2 0.25 0.05" type="box" rgba="0.8 0.6 0.4 1" group="1"/>
     </body>
   </worldbody>
 

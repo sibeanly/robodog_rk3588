@@ -102,14 +102,9 @@ class MujocoSimNode(Node):
         # is the correct body-frame source for the policy observation.
         self.gyro_adr = self._sensor_adr("body_gyro_sensor", 3)
 
-        # Height-scan: exclude the robot's own bodies so rays only hit terrain.
-        # bodyexclude takes a single body id; use the base_link (all leg bodies
-        # are descendants, but mj_ray only excludes one body — so we instead
-        # pass -1 and rely on shooting from above the robot so legs are below
-        # the ray origin only briefly; to robustly skip the robot, we exclude
-        # by checking the hit geom's body. Simpler: exclude base_link body id.
-        self.base_body_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_BODY,
-                                              "base_link")
+        # Height-scan: ray only against terrain geoms (group 1 = floor + box).
+        # Robot geoms are group 0, excluded via geomgroup so legs never pollute.
+        self._hs_geomgroup = np.array([0, 1, 0, 0, 0, 0], dtype=np.uint8)
         self._hs_geomid = np.array([-1], dtype=np.int32)
 
         # Initial PD target = keyframe qpos (STANDBY) so the robot holds its
@@ -202,17 +197,15 @@ class MujocoSimNode(Node):
         """Isaac-consistent height_scan: 187 yaw-aligned down-rays, clipped [-1,1].
 
         height_scan[i] = base_z - ray_hit_z - 0.5, where ray_hit_z is the world z
-        of the terrain hit point. Rays that miss (return -1) -> hit far below ->
-        clipped to -1. Robot's own bodies excluded via bodyexclude=base_body_id
-        (mj_ray excludes only one body, so legs may still be hit; shooting from
-        z=+20 above the base, the downward ray hits terrain first in practice).
+        of the terrain hit point. Rays only hit terrain geoms (group 1 = floor +
+        obstacles); robot geoms are group 0, excluded via geomgroup so legs never
+        pollute the scan. Misses (dist<0) -> very low -> clipped to -1.
         """
         base_pos = self.data.qpos[0:3].copy()
         base_quat = self.data.qpos[3:7].copy()  # wxyz
         w, x, y, z = base_quat
         yaw = np.arctan2(2 * (w * z + x * y), 1 - 2 * (y * y + z * z))
         cy, sy = np.cos(yaw), np.sin(yaw)
-        # yaw-only rotation applied to grid (x,y), z offset = +20
         gx = HS_GRID_LOCAL[:, 0]
         gy = HS_GRID_LOCAL[:, 1]
         wx = base_pos[0] + cy * gx - sy * gy
@@ -222,7 +215,7 @@ class MujocoSimNode(Node):
         for i in range(187):
             pnt = np.array([wx[i], wy[i], wz[i]])
             dist = mujoco.mj_ray(self.model, self.data, pnt, HS_RAY_DIR,
-                                 None, 1, self.base_body_id, self._hs_geomid)
+                                 self._hs_geomgroup, 1, -1, self._hs_geomid)
             if dist < 0:
                 hit_z[i] = -1e6  # miss -> very low -> clips to -1
             else:
