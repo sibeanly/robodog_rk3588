@@ -31,7 +31,12 @@ SCALE_CMD = 1.0  # cmd [vx, vy, wz] scaled by 1.0 (NOT [2,2,0.25] like old meviu
 HEIGHT_SCAN_SIZE = 187
 HEIGHT_SCAN_OFFSET = 0.5  # Isaac mdp.height_scan: base_z - ground_z - 0.5, clip [-1,1]
 CLIP_OBS = 100.0
-CLIP_ACTION = 1.0  # new model: clip raw onnx output to [-1, 1] before scaling
+# action clip: training used clip={".*": (-100,100)} (rough_env_cfg). RSL-RL actor
+# has no tanh, raw output is unbounded (up to ~±5). Clipping to [-1,1] truncates
+# the gait and prevents foot lift -> robot crouches instead of walking. Use the
+# training clip here. (Per DEPLOY_MUJOCO.md §6.3 core bug.)
+CLIP_ACTION = 100.0
+EFFORT_LIMIT = 60.0  # DCMotorCfg effort_limit; clip PD torque to ±60
 # [vx_lo, vx_hi, vy_lo, vy_hi, wz_lo, wz_hi]
 CLIP_CMD = np.array([-0.8, 0.8, -0.5, 0.5, -0.8, 0.8], dtype=np.float64)
 
@@ -90,8 +95,9 @@ def build_obs(ang_vel, quat_wxyz, cmd, dof_pos, dof_vel, last_action,
 def action_to_targets(action):
     """Map raw 12-dim onnx output to joint position targets (policy order).
 
-    target = default + clip(action, -1, 1) * per_joint_scale,
-    then clamped to JOINT_LIMITS.
+    target = default + clip(action, -CLIP_ACTION, CLIP_ACTION) * per_joint_scale,
+    then clamped to JOINT_LIMITS. CLIP_ACTION=100 matches the training action
+    clip (RSL-RL actor has no tanh; raw output is unbounded).
     """
     a = np.clip(np.asarray(action, dtype=np.float64), -CLIP_ACTION, CLIP_ACTION)
     tgt = DEFAULT_ANGLE + a * PER_JOINT_ACTION_SCALE

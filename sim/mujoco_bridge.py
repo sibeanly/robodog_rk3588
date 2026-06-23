@@ -51,6 +51,7 @@ JOINT_NAMES = [
 
 KP = 50.0
 KD = 2.0
+EFFORT_LIMIT = 60.0  # DCMotorCfg effort_limit; clip PD torque to +/-60
 SIM_HZ = 200
 
 # Height-scan ray grid: matches IsaacLab GridPatternCfg(resolution=0.1, size=[1.6,1.0]).
@@ -102,9 +103,15 @@ class MujocoSimNode(Node):
         # is the correct body-frame source for the policy observation.
         self.gyro_adr = self._sensor_adr("body_gyro_sensor", 3)
 
-        # Height-scan: ray only against terrain geoms (group 1 = floor + box).
-        # Robot geoms are group 0, excluded via geomgroup so legs never pollute.
-        self._hs_geomgroup = np.array([0, 1, 0, 0, 0, 0], dtype=np.uint8)
+        # Height-scan: put robot geoms in group 1 so downward rays (cast against
+        # group 0 = floor + obstacles) ignore the robot's own legs. Matches
+        # basemevius2/onnx_script/deploy_mujoco.py.
+        for g in range(self.model.ngeom):
+            bid = self.model.geom_bodyid[g]
+            bname = mujoco.mj_id2name(self.model, mujoco.mjtObj.mjOBJ_BODY, bid)
+            if bname not in (None, "world", "box"):  # robot body
+                self.model.geom_group[g] = 1
+        self._hs_geomgroup = np.array([1, 0, 0, 0, 0, 0], dtype=np.uint8)
         self._hs_geomid = np.array([-1], dtype=np.int32)
 
         # Initial PD target = keyframe qpos (STANDBY) so the robot holds its
@@ -226,12 +233,14 @@ class MujocoSimNode(Node):
         self.hs_pub.publish(msg)
 
     def step(self):
-        # PD using current (pre-step) qpos/qvel.
+        # PD using current (pre-step) qpos/qvel, recomputed every physics step
+        # (200Hz) to match Isaac Lab's continuous DCMotor PD (avoids damping
+        # starvation). Torque clipped to EFFORT_LIMIT (60 N.m, DCMotorCfg).
         with self.target_lock:
             tgt = self.target.copy()
         qpos = self.data.qpos[self.qpos_adr]
         qvel = self.data.qvel[self.qvel_adr]
-        tau = KP * (tgt - qpos) + KD * (-qvel)
+        tau = np.clip(KP * (tgt - qpos) + KD * (-qvel), -EFFORT_LIMIT, EFFORT_LIMIT)
         for i, aid in enumerate(self.actuator_id):
             self.data.ctrl[aid] = tau[i]
 

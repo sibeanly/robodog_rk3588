@@ -50,25 +50,33 @@ def test_action_to_targets_scale_and_clip():
     act = np.zeros(12); act[0] = 1.0
     tgt = action_to_targets(act)
     assert abs(tgt[0] - (0.0 + 1.0 * PER_JOINT_ACTION_SCALE[0])) < 1e-6
-    # action beyond clip 1.0 gets clamped to 1.0
-    act2 = np.zeros(12); act2[1] = 5.0  # hip, idx 1
+    # action beyond CLIP_ACTION (100) gets clamped to 100; a value below the
+    # clip (e.g. 5.0) passes through unscaled.
+    act_pass = np.zeros(12); act_pass[1] = 5.0  # hip, idx 1, below clip 100
+    tgt_pass = action_to_targets(act_pass)
+    assert abs(tgt_pass[1] - (0.7 + 5.0 * PER_JOINT_ACTION_SCALE[1])) < 1e-6
+    # action beyond clip 100 gets clamped to 100, then JOINT_LIMITS may bind.
+    # collar idx 0: default 0 + 100*0.125 = 12.5 -> clamped to +/-0.7854
+    act2 = np.zeros(12); act2[0] = 500.0  # collar idx 0, above clip 100
     tgt2 = action_to_targets(act2)
-    assert abs(tgt2[1] - (0.7 + CLIP_ACTION * PER_JOINT_ACTION_SCALE[1])) < 1e-6
+    assert abs(tgt2[0] - JOINT_LIMITS[0][1]) < 1e-6, (tgt2[0], JOINT_LIMITS[0])
 
 def test_extreme_action_stays_within_limits():
     """A large action still yields targets within JOINT_LIMITS.
 
-    NOTE: under CLIP_ACTION=1.0 the action clip in action_to_targets already
-    keeps targets inside JOINT_LIMITS, so the downstream
-    ``np.clip(tgt, JOINT_LIMITS[:,0], JOINT_LIMITS[:,1])`` is an UNREACHABLE
-    safety net through the public API. This test documents that safety
-    guarantee, not the clamp's execution -- it would still pass if the
-    JOINT_LIMITS clamp line were deleted (the CLIP_ACTION clamp already binds).
+    With CLIP_ACTION=100 (training value), raw actions up to ~±5 are not
+    clipped, so the JOINT_LIMITS clamp is the real safety net here -- a huge
+    action would otherwise drive targets past the URDF limits. This test
+    verifies the JOINT_LIMITS clamp actually binds for extreme inputs.
     """
     # huge negative knee action must not exceed lower limit
-    act = np.zeros(12); act[2] = -100.0  # knee idx 2
+    act = np.zeros(12); act[2] = -100.0  # knee idx 2, at clip boundary
     tgt = action_to_targets(act)
     assert tgt[2] >= JOINT_LIMITS[2][0] - 1e-6, (tgt[2], JOINT_LIMITS[2])
+    # huge positive hip action must not exceed upper limit
+    act3 = np.zeros(12); act3[1] = 100.0  # hip idx 1, at clip boundary
+    tgt3 = action_to_targets(act3)
+    assert tgt3[1] <= JOINT_LIMITS[1][1] + 1e-6, (tgt3[1], JOINT_LIMITS[1])
 
 def test_per_joint_scale_values():
     # collar=0.125, hip=0.15, knee=0.30 per leg
